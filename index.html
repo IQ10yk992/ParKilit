@@ -686,7 +686,7 @@ footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.06);padding
       <p class="hero-desc" data-t="hero_desc"></p>
       <div class="hero-btns">
         <button class="hbtn hbtn-primary" onclick="openApp()" data-t="hero_btn1"></button>
-        <a class="hbtn hbtn-ghost" href="#video-sec" data-t="hero_btn2"></a>
+        <button class="hbtn hbtn-ghost" onclick="scrollToSection('video-sec')" data-t="hero_btn2"></button>
       </div>
       <div class="hero-stats">
         <div class="hstat"><div class="hstat-num">3</div><div class="hstat-lbl" data-t="hero_s1"></div></div>
@@ -1511,9 +1511,9 @@ function navigate(path, replaceState = false) {
   if (path === currentRoute && !replaceState) return;
   currentRoute = path;
   if (replaceState) {
-    history.replaceState({ path }, '', path);
+    history.replaceState(null, '', '#' + path);
   } else {
-    history.pushState({ path }, '', path);
+    history.pushState(null, '', '#' + path);
   }
   applyRoute(path);
 }
@@ -1531,7 +1531,7 @@ function applyRoute(path) {
     appView.classList.add('active');
     // Show correct screen
     const screen = ROUTES[path] || 's-login';
-    showScreen(screen, false);
+    showScreen(screen);
   } else {
     landing.style.display = 'block';
     appView.style.display = 'none';
@@ -1540,22 +1540,7 @@ function applyRoute(path) {
   }
 }
 
-function showScreen(id, pushHistory = true) {
-  // Map screen to route
-  const routeMap = {
-    's-login': '/app',
-    's-admin': '/app/admin',
-    's-turnike': '/app/turnike',
-    's-scan': '/app/scan',
-    's-ok': '/app/success',
-    's-err': '/app/error',
-  };
-  if (pushHistory) {
-    const route = routeMap[id] || '/app';
-    currentRoute = route;
-    history.pushState({ path: route }, '', route);
-  }
-
+function showScreen(id) {
   document.querySelectorAll('#app-view .scr').forEach(s => {
     if (s.classList.contains('active')) {
       s.classList.add('out');
@@ -1564,17 +1549,17 @@ function showScreen(id, pushHistory = true) {
     }
   });
   setTimeout(() => {
-    const t = document.getElementById(id);
-    if (t) t.classList.add('active');
+    const el = document.getElementById(id);
+    if (el) el.classList.add('active');
   }, 80);
 }
 
-// Back/Forward handler
-window.addEventListener('popstate', (e) => {
-  const path = e.state?.path || '/';
+// Back/Forward handler (hash-based routing)
+window.addEventListener('popstate', () => {
+  const hash = window.location.hash;
+  const path = hash ? hash.slice(1) : '/';
+  if (path === currentRoute) return;
   currentRoute = path;
-
-  // Special handling: if going back to a scan screen, stop camera
   if (path === '/' || path === '/app') {
     stopQRCam();
   }
@@ -2416,8 +2401,9 @@ function init() {
   // Apply translations
   applyTranslations();
 
-  // Handle current URL on page load
-  const path = window.location.pathname;
+  // Handle current URL on page load (hash-based routing)
+  const hash = window.location.hash;
+  const path = hash ? hash.slice(1) : '/';
   if (path.startsWith('/app')) {
     // Check session
     const ses = DB.getSession();
@@ -2425,7 +2411,7 @@ function init() {
       CU = ses;
       const st = DB.getStatus(ses.tc);
       scanMode = st === 'inside' ? 'exit' : 'entry';
-      history.replaceState({ path }, '', path);
+      currentRoute = path;
       applyRoute(path);
       setupScanUI();
       startQRCam();
@@ -2434,7 +2420,7 @@ function init() {
       setRole('reg');
     }
   } else {
-    history.replaceState({ path: '/' }, '', '/');
+    currentRoute = '/';
     applyRoute('/');
   }
 
