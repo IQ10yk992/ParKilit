@@ -10,6 +10,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <style>
 /* ═══════════════════════════════════
    CSS VARIABLES & RESET
@@ -615,6 +617,8 @@ footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.06);padding
   nav .nav-links{display:none;}
   .adm-body{grid-template-columns:1fr;}
   .tur-right{display:none;}
+  #parks .section-inner > div{grid-template-columns:1fr!important;}
+  #parks .section-inner > div > div:last-child{grid-template-columns:1fr 1fr;}
 }
 @media(max-width:480px){
   .features-grid,.team-grid{grid-template-columns:1fr 1fr;}
@@ -662,6 +666,7 @@ footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.06);padding
       <span class="nav-link" onclick="scrollToSection('video-sec')" data-t="nav_video"></span>
       <span class="nav-link" onclick="scrollToSection('future')" data-t="nav_future"></span>
       <span class="nav-link" onclick="scrollToSection('team')" data-t="nav_team"></span>
+      <span class="nav-link" onclick="scrollToSection('parks')" style="color:rgba(255,255,255,.65)">🏙️ Parklar</span>
     </div>
     <div class="nav-right">
       <div class="lang-row">
@@ -843,6 +848,59 @@ footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.06);padding
 </section>
 
 <!-- CTA -->
+<!-- YENİ BÖLÜM: Her parka özel hesap -->
+<section id="parks" style="background:var(--white);padding:90px 24px;">
+  <div class="section-inner">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;">
+      <div>
+        <div class="sec-badge green" style="margin-bottom:14px;">🏙️ Genişleme Modeli</div>
+        <h2 class="sec-title">Her park için<br><span style="background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ayrı yönetim hesabı</span></h2>
+        <p class="sec-desc" style="margin-top:12px;margin-bottom:24px;">ParKilit halka açıldığında her belediye veya park yönetimi kendi bağımsız hesabını oluşturacak. Her park kendi kullanıcılarını, giriş kayıtlarını ve raporlarını ayrı ayrı yönetebilecek.</p>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:flex-start;gap:12px;background:var(--off);border-radius:14px;padding:16px;">
+            <span style="font-size:24px;flex-shrink:0;">🏛️</span>
+            <div><div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:3px;">Belediye Hesabı</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Her belediye tüm parkları tek panelden yönetir. Toplu istatistik ve raporlara erişir.</div></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;background:var(--off);border-radius:14px;padding:16px;">
+            <span style="font-size:24px;flex-shrink:0;">🅿️</span>
+            <div><div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:3px;">Park Hesabı</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Her parkın kendi admin ve turnike şifresi olur. Kullanıcılar o parka özel kayıt olur.</div></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;background:var(--off);border-radius:14px;padding:16px;">
+            <span style="font-size:24px;flex-shrink:0;">👤</span>
+            <div><div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:3px;">Evrensel Kullanıcı</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">İleride tek kayıtla tüm parklara giriş yapılabilecek. TC kimlik merkezi doğrulama ile.</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="background:linear-gradient(135deg,#1a73e8,#0d5bba);border-radius:18px;padding:22px;color:#fff;text-align:center;">
+          <div style="font-size:32px;margin-bottom:8px;">🌳</div>
+          <div style="font-family:'Poppins',sans-serif;font-size:24px;font-weight:900;">Beykoz</div>
+          <div style="font-size:11px;opacity:.7;margin-top:4px;">Pilot Park</div>
+          <div style="margin-top:12px;background:rgba(255,255,255,.15);border-radius:8px;padding:6px;font-size:11px;font-weight:700;">✅ Aktif</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#64748b,#475569);border-radius:18px;padding:22px;color:#fff;text-align:center;opacity:.6;">
+          <div style="font-size:32px;margin-bottom:8px;">🌲</div>
+          <div style="font-family:'Poppins',sans-serif;font-size:24px;font-weight:900;">Kadıköy</div>
+          <div style="font-size:11px;opacity:.7;margin-top:4px;">Yakında</div>
+          <div style="margin-top:12px;background:rgba(255,255,255,.1);border-radius:8px;padding:6px;font-size:11px;font-weight:700;">🔜 Planlıyor</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#64748b,#475569);border-radius:18px;padding:22px;color:#fff;text-align:center;opacity:.6;">
+          <div style="font-size:32px;margin-bottom:8px;">🏙️</div>
+          <div style="font-family:'Poppins',sans-serif;font-size:24px;font-weight:900;">Üsküdar</div>
+          <div style="font-size:11px;opacity:.7;margin-top:4px;">Yakında</div>
+          <div style="margin-top:12px;background:rgba(255,255,255,.1);border-radius:8px;padding:6px;font-size:11px;font-weight:700;">🔜 Planlıyor</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#06b6d4,#0891b2);border-radius:18px;padding:22px;color:#fff;text-align:center;">
+          <div style="font-size:32px;margin-bottom:8px;">➕</div>
+          <div style="font-family:'Poppins',sans-serif;font-size:24px;font-weight:900;">Sizin Park</div>
+          <div style="font-size:11px;opacity:.7;margin-top:4px;">İletişime Geçin</div>
+          <div style="margin-top:12px;background:rgba(255,255,255,.15);border-radius:8px;padding:6px;font-size:11px;font-weight:700;">📩 Başvur</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="cta">
   <div class="section-inner sec-center">
     <h2 class="cta-title" data-t="cta_title"></h2>
@@ -862,6 +920,7 @@ footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.06);padding
       <span class="footer-link" onclick="scrollToSection('problem')" data-t="nav_project"></span>
       <span class="footer-link" onclick="scrollToSection('dfc')" data-t="nav_dfc"></span>
       <span class="footer-link" onclick="scrollToSection('team')" data-t="nav_team"></span>
+      <span class="footer-link" onclick="scrollToSection('parks')">🏙️ Parklar</span>
       <a class="footer-link" href="https://www.instagram.com/parkilit_/" target="_blank">📸 Instagram</a>
     </div>
   </div>
@@ -906,7 +965,7 @@ footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.06);padding
           <div class="err-box" id="adm-err"></div>
           <button class="lc-btn" id="adm-btn" onclick="doAdminLogin()" data-t="btn_admin"></button>
         </div>
-        <div class="lc-hint" data-t="hint_admin"></div>
+        <div class="lc-hint" data-t="hint_admin" style="display:none"></div>
       </div>
 
       <!-- Kayıt panel -->
@@ -949,6 +1008,10 @@ footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.06);padding
       <div><div class="tur-brand-txt" data-t="tur_brand"></div><div class="tur-sub-txt" data-t="tur_sub_lbl"></div></div>
       <div class="tur-top-right">
         <div class="tur-clock" id="tur-clock">--:--:--</div>
+        <div id="fb-status" style="display:flex;align-items:center;gap:6px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:5px 11px;border-radius:8px;font-size:11px;font-weight:700;color:#fca5a5;transition:all .6s;">
+          <div id="fb-dot" style="width:7px;height:7px;border-radius:50%;background:#f87171;flex-shrink:0;animation:blink 1.2s infinite;"></div>
+          <span id="fb-txt">Bağlanıyor...</span>
+        </div>
         <button class="tur-logout-btn" onclick="goLogin()" data-t="adm_logout"></button>
       </div>
     </div>
@@ -1033,6 +1096,11 @@ footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.06);padding
         <div class="stat-mini sm-b"><span class="sm-ico">👥</span><div><div class="sm-num sm-nb" id="cnt-users">0</div><div class="sm-lbl" data-t="stat_users"></div></div></div>
         <div class="stat-mini sm-t"><span class="sm-ico">🅿️</span><div><div class="sm-num sm-nt" id="cnt-inside">0</div><div class="sm-lbl" data-t="stat_inside"></div></div></div>
       </div>
+      <div style="padding:0 14px 14px;">
+        <button onclick="adminForceExitAll()" style="width:100%;background:linear-gradient(135deg,#ff6b35,#e85d04);color:#fff;border:none;border-radius:12px;padding:11px;font-family:var(--sans);font-size:13px;font-weight:800;cursor:pointer;">
+          🚨 İçerideki Herkesi Dışarı Al
+        </button>
+      </div>
     </div>
     <div class="adm-card">
       <div class="adm-card-hdr"><div class="adm-card-ttl" data-t="card_gen"></div><span class="badge badge-b">QR</span></div>
@@ -1075,6 +1143,7 @@ footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.06);padding
         <button class="rpr-btn rpr-pdf" onclick="exportPDF()" data-t="rpr_pdf"></button>
         <button class="rpr-btn rpr-csv" onclick="exportCSV()" data-t="rpr_csv"></button>
         <button class="rpr-btn rpr-img" onclick="exportPhotos()" data-t="rpr_photo"></button>
+        <button class="rpr-btn" onclick="adminClearAllEntries()" style="background:var(--red-l);color:var(--red);">🗑️ Temizle</button>
       </div>
       <div class="rpr-preview" id="rpr-preview"><div style="font-size:12px;color:var(--text3);text-align:center;padding:14px;" data-t="rpr_waiting"></div></div>
     </div>
@@ -1223,9 +1292,9 @@ const T = {
     login_title:'Hoş Geldiniz 👋', login_sub:'TC Kimlik No ile giriş yapın',
     lbl_user:'Kullanıcı Adı', lbl_pw:'Şifre', lbl_pw2:'Şifre Tekrar',
     lbl_name:'Ad', lbl_surname:'Soyad', lbl_tc:'TC Kimlik No', lbl_tel:'Telefon (opsiyonel)',
-    ph_user:'admin', ph_pw:'••••••', ph_name:'Adınız', ph_surname:'Soyadınız',
+    ph_user:'Kullanıcı adı', ph_pw:'••••••', ph_name:'Adınız', ph_surname:'Soyadınız',
     ph_tc:'11 haneli TC kimlik no', ph_tel:'05xx xxx xx xx', ph_pw2:'Şifreyi tekrar girin',
-    hint_admin:'varsayılan: admin / admin',
+    hint_admin:'',
     kvkk:'KVKK Onayı: Kimlik bilgilerimin park güvenliği amacıyla işlenmesine onay veriyorum.',
     btn_admin:'⚙️ Admin Panele Giriş', btn_turnike:'🔲 Turnike Ekranını Aç',
     btn_reg:'✅ Hesap Oluştur', btn_login:'🔓 Giriş Yap', btn_forgot:'Şifremi Unuttum?',
@@ -1381,9 +1450,9 @@ const T = {
     login_title:'Welcome 👋', login_sub:'Login with your national ID',
     lbl_user:'Username', lbl_pw:'Password', lbl_pw2:'Confirm Password',
     lbl_name:'First Name', lbl_surname:'Last Name', lbl_tc:'National ID No', lbl_tel:'Phone (optional)',
-    ph_user:'admin', ph_pw:'••••••', ph_name:'Your Name', ph_surname:'Your Surname',
+    ph_user:'Username', ph_pw:'••••••', ph_name:'Your Name', ph_surname:'Your Surname',
     ph_tc:'11-digit national ID', ph_tel:'Your phone number', ph_pw2:'Repeat password',
-    hint_admin:'default: admin / admin',
+    hint_admin:'',
     kvkk:'KVKK Consent: I agree to my identity information being processed for park security purposes.',
     btn_admin:'⚙️ Enter Admin Panel', btn_turnike:'🔲 Open Turnstile Screen',
     btn_reg:'✅ Create Account', btn_login:'🔓 Login', btn_forgot:'Forgot Password?',
@@ -1611,69 +1680,261 @@ function scrollToSection(id) {
 // ═══════════════════════════════════════
 //  DATA LAYER — localStorage + BroadcastChannel
 // ═══════════════════════════════════════
-let bc; // BroadcastChannel for cross-tab sync
-try { bc = new BroadcastChannel('parkilit'); } catch(e) { bc = null; }
+// ═══════════════════════════════════════
+//  FİREBASE YAPILANDIRMA
+// ═══════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyBaV-lhIcMruSqyqOPm7WpcVhLQBWkMY9E",
+  authDomain:        "parkilit.firebaseapp.com",
+  databaseURL:       "https://parkilit-default-rtdb.firebaseio.com",
+  projectId:         "parkilit",
+  storageBucket:     "parkilit.firebasestorage.app",
+  messagingSenderId: "46792234408",
+  appId:             "1:46792234408:web:5d20102f0cfc49af52799d"
+};
+
+// Firebase başlat
+let fdb = null; // Firebase Realtime Database referansı
+
+function initFirebase() {
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    fdb = firebase.database();
+
+    // ── Bağlantı durumu göstergesi ──
+    fdb.ref('.info/connected').on('value', snap => {
+      const connected = snap.val();
+      const pill = document.getElementById('fb-status');
+      const dot  = document.getElementById('fb-dot');
+      const txt  = document.getElementById('fb-txt');
+      if (!pill) return;
+      if (connected) {
+        pill.style.background    = 'rgba(16,185,129,.15)';
+        pill.style.borderColor   = 'rgba(16,185,129,.3)';
+        pill.style.color         = '#34d399';
+        dot.style.background     = '#10b981';
+        dot.style.animation      = 'none';
+        dot.style.boxShadow      = '0 0 8px #10b981';
+        txt.textContent          = '● Firebase Bağlı';
+      } else {
+        pill.style.background    = 'rgba(239,68,68,.15)';
+        pill.style.borderColor   = 'rgba(239,68,68,.3)';
+        pill.style.color         = '#fca5a5';
+        dot.style.background     = '#f87171';
+        dot.style.animation      = 'blink 1.2s infinite';
+        dot.style.boxShadow      = 'none';
+        txt.textContent          = '○ Bağlantı Yok';
+      }
+    });
+
+    // ── Firebase dinleyicilerini kur ──
+    setupFirebaseListeners();
+    console.log('✅ Firebase bağlandı');
+  } catch(e) {
+    console.warn('⚠️ Firebase başlatılamadı, localStorage ile devam:', e.message);
+    fdb = null;
+  }
+}
+
+function setupFirebaseListeners() {
+  if (!fdb) return;
+
+  // Kullanıcılar değişince yerel cache'i güncelle
+  fdb.ref('pk/users').on('value', snap => {
+    const data = snap.val();
+    if (data) {
+      const users = Object.values(data);
+      localStorage.setItem('pk_users', JSON.stringify(users));
+    }
+  });
+
+  // Giriş/çıkış kayıtları değişince admin'i güncelle
+  fdb.ref('pk/entries').on('value', snap => {
+    const data = snap.val();
+    if (data) {
+      const entries = [];
+      Object.values(data).forEach(tcGroup => {
+        if (typeof tcGroup === 'object') {
+          Object.values(tcGroup).forEach(e => { if(e) entries.push(e); });
+        }
+      });
+      entries.sort((a,b) => (a.timestamp||0) - (b.timestamp||0));
+      localStorage.setItem('pk_entries', JSON.stringify(entries));
+      refreshAdminUI();
+      updateRprPreview();
+    }
+  });
+
+  // QR değişince yerel cache'i güncelle
+  fdb.ref('pk/qr').on('value', snap => {
+    const qr = snap.val();
+    if (qr) localStorage.setItem('pk_qr', JSON.stringify(qr));
+  });
+
+  // Pending: Turnike ekranı fotoğraf çekecek
+  fdb.ref('pk/pending').on('value', snap => {
+    const p = snap.val();
+    if (!p) return;
+    // Sadece turnike ekranı tepki verir
+    if (document.getElementById('s-turnike') &&
+        document.getElementById('s-turnike').classList.contains('active')) {
+      handleTurnikePending(p);
+    }
+  });
+
+  // Result: Kullanıcı ekranı sonucu alacak
+  fdb.ref('pk/result').on('value', snap => {
+    const res = snap.val();
+    if (!res) return;
+    if (window._resultHandler) {
+      window._resultHandler(res);
+      window._resultHandler = null;
+    }
+  });
+
+  // Park durumları değişince yerel cache'i güncelle
+  fdb.ref('pk/status').on('value', snap => {
+    const data = snap.val();
+    if (data) {
+      Object.entries(data).forEach(([tc, s]) => {
+        localStorage.setItem('pk_status_'+tc, s);
+      });
+      refreshAdminUI();
+    }
+  });
+}
+
+// ═══════════════════════════════════════
+//  VERİ KATMANI (DB)
+//  Yazma: Firebase + localStorage (cache)
+//  Okuma: localStorage (hızlı, sync)
+//  Dinleme: Firebase listeners (yukarıda)
+// ═══════════════════════════════════════
+
+// Aynı cihaz farklı sekme sync (ek olarak)
+let bc = null;
+try { bc = new BroadcastChannel('parkilit'); } catch(e) {}
 
 const DB = {
-  getUsers:    () => { try{return JSON.parse(localStorage.getItem('pk_users')||'[]');}catch{return[];} },
-  saveUsers:   (u) => { localStorage.setItem('pk_users', JSON.stringify(u)); },
-  getSession:  () => { try{return JSON.parse(localStorage.getItem('pk_ses')||'null');}catch{return null;} },
-  saveSession: (u) => localStorage.setItem('pk_ses', JSON.stringify(u)),
-  clearSession:()  => localStorage.removeItem('pk_ses'),
-  getEntries:  () => { try{return JSON.parse(localStorage.getItem('pk_entries')||'[]');}catch{return[];} },
-  addEntry:    (e) => {
-    const l = DB.getEntries(); l.push(e);
+  // ── KULLANICILAR ──
+  getUsers: () => {
+    try { return JSON.parse(localStorage.getItem('pk_users')||'[]'); } catch { return []; }
+  },
+  saveUsers: (users) => {
+    localStorage.setItem('pk_users', JSON.stringify(users));
+    if (fdb) {
+      const obj = {};
+      users.forEach(u => { obj[u.tc] = u; });
+      fdb.ref('pk/users').set(obj).catch(e => console.warn('saveUsers Firebase hata:', e.message));
+    }
+  },
+
+  // ── OTURUM (sadece yerel — her cihaz kendi oturumunu tutar) ──
+  getSession:   ()  => { try { return JSON.parse(localStorage.getItem('pk_ses')||'null'); } catch { return null; } },
+  saveSession:  (u) => localStorage.setItem('pk_ses', JSON.stringify(u)),
+  clearSession: ()  => localStorage.removeItem('pk_ses'),
+
+  // ── GİRİŞ/ÇIKIŞ KAYITLARI ──
+  getEntries: () => {
+    try { return JSON.parse(localStorage.getItem('pk_entries')||'[]'); } catch { return []; }
+  },
+  addEntry: (entry) => {
+    // Önce localStorage'a yaz (anlık göster)
+    const l = DB.getEntries(); l.push(entry);
     localStorage.setItem('pk_entries', JSON.stringify(l));
-    if (bc) bc.postMessage({ type: 'entry_added', entry: e });
+    // Firebase'e yaz
+    if (fdb) {
+      // Fotoğraf varsa sıkıştır (Firebase 10MB limit)
+      const e = { ...entry };
+      if (e.photo && e.photo.length > 100000) {
+        e.photo = compressPhoto(e.photo, 320, 240, 0.45);
+      }
+      fdb.ref('pk/entries/' + e.tc).push(e).catch(err => console.warn('addEntry Firebase hata:', err.message));
+    }
+    // Aynı cihaz diğer sekmelere bildir
+    if (bc) bc.postMessage({ type: 'entry_added' });
     refreshAdminUI(); updateRprPreview();
   },
+
+  // ── QR ANAHTAR ──
   setQR: (qrObj) => {
     localStorage.setItem('pk_qr', JSON.stringify(qrObj));
-    if (bc) bc.postMessage({ type: 'qr_updated', qr: qrObj });
+    if (fdb) fdb.ref('pk/qr').set(qrObj).catch(e => console.warn('setQR hata:', e.message));
   },
-  getQR: () => { try{return JSON.parse(localStorage.getItem('pk_qr')||'null');}catch{return null;} },
-  getPending:   ()  => { try{return JSON.parse(localStorage.getItem('pk_pending')||'null');}catch{return null;} },
-  setPending:   (p) => {
+  getQR: () => {
+    try { return JSON.parse(localStorage.getItem('pk_qr')||'null'); } catch { return null; }
+  },
+
+  // ── FOTOĞRAF BEKLEMESİ (cihazlar arası) ──
+  getPending: ()  => { try { return JSON.parse(localStorage.getItem('pk_pending')||'null'); } catch { return null; } },
+  setPending: (p) => {
     localStorage.setItem('pk_pending', JSON.stringify(p));
+    if (fdb) fdb.ref('pk/pending').set(p).catch(e => console.warn('setPending hata:', e.message));
     if (bc) bc.postMessage({ type: 'pending', pending: p });
   },
-  clearPending: ()  => {
+  clearPending: () => {
     localStorage.removeItem('pk_pending');
+    if (fdb) fdb.ref('pk/pending').remove().catch(()=>{});
     if (bc) bc.postMessage({ type: 'pending_clear' });
   },
-  getResult:    ()  => { try{return JSON.parse(localStorage.getItem('pk_result')||'null');}catch{return null;} },
-  setResult:    (r) => {
+
+  // ── SONUÇ ──
+  getResult: ()  => { try { return JSON.parse(localStorage.getItem('pk_result')||'null'); } catch { return null; } },
+  setResult: (r) => {
     localStorage.setItem('pk_result', JSON.stringify(r));
+    if (fdb) {
+      const res = { ...r };
+      if (res.photo && res.photo.length > 100000) {
+        res.photo = compressPhoto(res.photo, 320, 240, 0.45);
+      }
+      fdb.ref('pk/result').set(res).catch(e => console.warn('setResult hata:', e.message));
+    }
     if (bc) bc.postMessage({ type: 'result', result: r });
   },
-  clearResult:  ()  => {
+  clearResult: () => {
     localStorage.removeItem('pk_result');
+    if (fdb) fdb.ref('pk/result').remove().catch(()=>{});
     if (bc) bc.postMessage({ type: 'result_clear' });
   },
-  getStatus:    (tc) => localStorage.getItem('pk_status_'+tc)||'outside',
-  setStatus:    (tc, s) => {
+
+  // ── PARK DURUMU ──
+  getStatus: (tc) => localStorage.getItem('pk_status_'+tc)||'outside',
+  setStatus: (tc, s) => {
     localStorage.setItem('pk_status_'+tc, s);
+    if (fdb) fdb.ref('pk/status/'+tc).set(s).catch(e => console.warn('setStatus hata:', e.message));
     if (bc) bc.postMessage({ type: 'status', tc, status: s });
   },
 };
 
-// BroadcastChannel listener
+// BroadcastChannel (aynı cihaz, farklı sekme)
 if (bc) {
   bc.onmessage = (e) => {
     const { type } = e.data;
     if (type === 'entry_added') {
       refreshAdminUI(); updateRprPreview();
     } else if (type === 'pending') {
-      // Turnike sekmesi: pending geldi, fotoğraf çek
       handleTurnikePending(e.data.pending);
     } else if (type === 'result') {
-      // Kullanıcı sekmesi: result geldi
       if (window._resultHandler) {
         window._resultHandler(e.data.result);
         window._resultHandler = null;
       }
     }
   };
+}
+
+// Fotoğraf sıkıştırma (Firebase boyut limiti için)
+function compressPhoto(dataUrl, maxW, maxH, quality) {
+  try {
+    const canvas = document.createElement('canvas');
+    const img = new Image();
+    img.src = dataUrl;
+    const ratio = Math.min(maxW / (img.width||640), maxH / (img.height||480));
+    canvas.width  = Math.round((img.width||640)  * ratio);
+    canvas.height = Math.round((img.height||480) * ratio);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL('image/jpeg', quality);
+  } catch(e) { return dataUrl; }
 }
 
 // ═══════════════════════════════════════
@@ -1780,15 +2041,15 @@ function setRole(role) {
     btn.textContent = t('btn_turnike');
     btn.onclick = doTurnikeLogin;
   }
-  // Pre-fill admin values
+  // Güvenlik: alanlar boş bırak
   if (role === 'admin' || role === 'turnike') {
-    document.getElementById('adm-user').value = 'admin';
-    document.getElementById('adm-pw').value = 'admin';
+    document.getElementById('adm-user').value = '';
+    document.getElementById('adm-pw').value = '';
   }
 }
 
 function doAdminLogin() {
-  if (document.getElementById('adm-user').value !== 'admin' || document.getElementById('adm-pw').value !== 'admin') {
+  if (document.getElementById('adm-user').value !== 'parkilit_admin' || document.getElementById('adm-pw').value !== 'ParK!l1t@2025') {
     showErr('adm-err', t('err_admin')); return;
   }
   load(true);
@@ -1801,7 +2062,7 @@ function doAdminLogin() {
 }
 
 function doTurnikeLogin() {
-  if (document.getElementById('adm-user').value !== 'admin' || document.getElementById('adm-pw').value !== 'admin') {
+  if (document.getElementById('adm-user').value !== 'parkilit_admin' || document.getElementById('adm-pw').value !== 'TuRn!Ke#99') {
     showErr('adm-err', t('err_admin')); return;
   }
   load(true);
@@ -1843,15 +2104,45 @@ function doLogin() {
   if (!tcValid(tc)) return showErr('login-err', t('err_tc_only'));
   if (!pw) return showErr('login-err', t('err_pw_only'));
   load(true);
-  setTimeout(() => {
+
+  function tryLogin() {
     const user = DB.getUsers().find(u => u.tc === tc && u.pw === hashPw(pw));
     load(false);
     if (!user) return showErr('login-err', t('err_creds'));
     CU = user; DB.saveSession(user);
-    const st = DB.getStatus(user.tc); scanMode = st === 'inside' ? 'exit' : 'entry';
+    // Firebase'den anlık durumu al
+    if (fdb) {
+      fdb.ref('pk/status/'+tc).once('value', snap => {
+        const st = snap.val() || 'outside';
+        localStorage.setItem('pk_status_'+tc, st);
+        scanMode = st === 'inside' ? 'exit' : 'entry';
+        setupScanUI(); navigate('/app/scan'); startQRCam();
+      }).catch(() => {
+        const st = DB.getStatus(tc);
+        scanMode = st === 'inside' ? 'exit' : 'entry';
+        setupScanUI(); navigate('/app/scan'); startQRCam();
+      });
+    } else {
+      const st = DB.getStatus(tc);
+      scanMode = st === 'inside' ? 'exit' : 'entry';
+      setupScanUI(); navigate('/app/scan'); startQRCam();
+    }
     toast('👋', t('toast_welcome'));
-    setupScanUI(); navigate('/app/scan'); startQRCam();
-  }, 500);
+  }
+
+  // Firebase varsa önce sync et
+  if (fdb) {
+    fdb.ref('pk/users').once('value', snap => {
+      const data = snap.val();
+      if (data) {
+        const users = Object.values(data);
+        localStorage.setItem('pk_users', JSON.stringify(users));
+      }
+      tryLogin();
+    }).catch(() => tryLogin());
+  } else {
+    setTimeout(tryLogin, 300);
+  }
 }
 
 function doForgot() {
@@ -1899,10 +2190,13 @@ function refreshAdminUI() {
     else uList.innerHTML = users.map(u => {
       const st = DB.getStatus(u.tc);
       const inside = st === 'inside';
-      return `<div class="log-item">
+      return `<div class="log-item" style="flex-wrap:wrap;gap:8px;">
         <div class="log-thumb" style="display:flex;align-items:center;justify-content:center;font-size:16px;background:${inside?'var(--green-l)':'var(--off)'};">${inside?'🟢':'⚪'}</div>
         <div class="log-info"><div class="log-name">${u.ad} ${u.soyad}</div><div class="log-meta">${u.tc.substring(0,3)}***${u.tc.slice(-2)} · ${t(inside?'inside_status':'outside_status')}</div></div>
-        <span class="log-tag ${inside?'in':'out'}">${t(inside?'log_entry':'log_exit')}</span>
+        <div style="display:flex;gap:5px;margin-left:auto;align-items:center;">
+          ${inside ? `<button onclick="adminForceExit('${u.tc}','${u.ad} ${u.soyad}')" style="background:var(--pink-l);color:var(--pink);border:1.5px solid rgba(247,37,133,.25);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;">🚪 Çıkar</button>` : ''}
+          <button onclick="adminDeleteUser('${u.tc}','${u.ad} ${u.soyad}')" style="background:var(--red-l);color:var(--red);border:1.5px solid rgba(239,68,68,.2);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:800;cursor:pointer;">🗑️</button>
+        </div>
       </div>`;
     }).join('');
   }
@@ -1975,6 +2269,62 @@ window.printCard = () => {
 window.saveCardImg = () => toast('💾', t('toast_cam_hint'), 4000);
 
 // Export
+
+// ── ADMİN GÜÇLENDİRİLMİŞ YETKİLER ──
+window.adminForceExitAll = () => {
+  const users = DB.getUsers();
+  const inside = users.filter(u => DB.getStatus(u.tc) === 'inside');
+  if (!inside.length) { toast('ℹ️', 'Park içinde kimse yok.', 3000); return; }
+  if (!confirm(`Park içindeki ${inside.length} kişiyi çıkarmak istediğine emin misin?`)) return;
+  const now = new Date();
+  inside.forEach(u => {
+    DB.setStatus(u.tc, 'outside');
+    const entry = {
+      mode: 'exit', tc: u.tc, name: u.ad+' '+u.soyad,
+      time: now.toLocaleTimeString(lang==='en'?'en-GB':'tr-TR'),
+      timestamp: Date.now(), photo: null, source: 'admin_force_all'
+    };
+    DB.addEntry(entry);
+  });
+  refreshAdminUI();
+  toast('🚨', inside.length + ' kişi parktan çıkarıldı.', 4000);
+};
+
+window.adminForceExit = (tc, name) => {
+  if (!confirm('"' + name + '" adlı kişiyi parktan çıkarmak istediğine emin misin?')) return;
+  DB.setStatus(tc, 'outside');
+  const now = new Date();
+  const entry = {
+    mode: 'exit', tc, name,
+    time: now.toLocaleTimeString(lang==='en'?'en-GB':'tr-TR'),
+    timestamp: Date.now(), photo: null, source: 'admin_force'
+  };
+  DB.addEntry(entry);
+  refreshAdminUI();
+  toast('🚪', name + ' parktan çıkarıldı.', 3000);
+};
+
+window.adminDeleteUser = (tc, name) => {
+  if (!confirm('"' + name + '" adlı üyeyi sistemden tamamen silmek istediğine emin misin?\n\nBu işlem geri alınamaz!')) return;
+  const users = DB.getUsers().filter(u => u.tc !== tc);
+  DB.saveUsers(users);
+  DB.setStatus(tc, 'outside');
+  if (fdb) {
+    fdb.ref('pk/users/' + tc).remove().catch(()=>{});
+    fdb.ref('pk/status/' + tc).remove().catch(()=>{});
+  }
+  refreshAdminUI();
+  toast('🗑️', name + ' sistemden silindi.', 3000);
+};
+
+window.adminClearAllEntries = () => {
+  if (!confirm('Tüm giriş/çıkış kayıtlarını silmek istediğine emin misin?\n\nBu işlem geri alınamaz!')) return;
+  localStorage.setItem('pk_entries', '[]');
+  if (fdb) fdb.ref('pk/entries').remove().catch(()=>{});
+  refreshAdminUI(); updateRprPreview();
+  toast('🗑️', 'Tüm kayıtlar silindi.', 3000);
+};
+
 window.exportCSV = () => {
   const e = DB.getEntries();
   if (!e.length) { toast('⚠️', t('toast_no_entries')); return; }
@@ -2098,7 +2448,7 @@ function captureTurPhoto() {
   const ctx = c.getContext('2d');
   ctx.save(); ctx.translate(c.width, 0); ctx.scale(-1, 1);
   ctx.drawImage(v, 0, 0, c.width, c.height); ctx.restore();
-  return c.toDataURL('image/jpeg', 0.8);
+  return c.toDataURL('image/jpeg', 0.5); // Firebase boyut limiti
 }
 
 function turFlash() {
@@ -2365,6 +2715,21 @@ window.doManuel = () => {
 };
 
 // CONFETTI
+
+// Fotoğraf sıkıştırma (Firebase boyut limiti için)
+function compressPhoto(dataUrl, maxW, maxH, quality) {
+  try {
+    const canvas = document.createElement('canvas');
+    const img = new Image();
+    img.src = dataUrl;
+    const ratio = Math.min(maxW / (img.width||640), maxH / (img.height||480));
+    canvas.width  = Math.round((img.width||640)  * ratio);
+    canvas.height = Math.round((img.height||480) * ratio);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL('image/jpeg', quality);
+  } catch(e) { return dataUrl; }
+}
+
 function launchConfetti() {
   const canvas = document.getElementById('confetti-cvs');
   if (!canvas) return;
@@ -2398,6 +2763,16 @@ function launchConfetti() {
 //  INIT
 // ═══════════════════════════════════════
 function init() {
+  // Firebase'i başlat (SDK yüklendikten sonra)
+  if (typeof firebase !== 'undefined') {
+    initFirebase();
+  } else {
+    // SDK henüz yüklenmemişse kısa bekle
+    window.addEventListener('load', () => {
+      if (typeof firebase !== 'undefined') initFirebase();
+    });
+  }
+
   // Apply translations
   applyTranslations();
 
