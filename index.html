@@ -2170,30 +2170,25 @@ function initFirebase() {
 function setupFirebaseListeners() {
   if (!fdb) return;
 
-  // Kullanıcılar değişince yerel cache'i güncelle
-  fdb.ref('pk/users').on('value', snap => {
+  // Yeni yapı: logs/{logId}
+  fdb.ref('logs').on('value', snap => {
     const data = snap.val();
     if (data) {
-      const users = Object.values(data);
-      localStorage.setItem('pk_users', JSON.stringify(users));
-    }
-  });
-
-  // Giriş/çıkış kayıtları değişince admin'i güncelle
-  fdb.ref('pk/entries').on('value', snap => {
-    const data = snap.val();
-    if (data) {
-      const entries = [];
-      Object.values(data).forEach(tcGroup => {
-        if (typeof tcGroup === 'object') {
-          Object.values(tcGroup).forEach(e => { if(e) entries.push(e); });
-        }
-      });
+      const entries = Object.values(data).filter(Boolean).map(l => ({
+        ...l,
+        mode: l.mode || l.type || 'entry',
+        type: l.type || l.mode || 'entry'
+      }));
       entries.sort((a,b) => (a.timestamp||0) - (b.timestamp||0));
       localStorage.setItem('pk_entries', JSON.stringify(entries));
       refreshAdminUI();
       updateRprPreview();
     }
+  });
+  // Hybrid QR sessions
+  fdb.ref('qrSessions').on('value', snap => {
+    const data = snap.val() || {};
+    saveQrSessionsMap(data);
   });
 
   // QR değişince yerel cache'i güncelle
@@ -2223,15 +2218,34 @@ function setupFirebaseListeners() {
     }
   });
 
-  // Park durumları değişince yerel cache'i güncelle
-  fdb.ref('pk/status').on('value', snap => {
+  // Yeni yapı: users/{tc}/inside
+  fdb.ref('users').on('value', snap => {
     const data = snap.val();
-    if (data) {
-      Object.entries(data).forEach(([tc, s]) => {
-        localStorage.setItem('pk_status_'+tc, s);
-      });
-      refreshAdminUI();
-    }
+    if (!data) return;
+    const users = [];
+    Object.entries(data).forEach(([tc, val]) => {
+      if (!val || typeof val !== 'object') return;
+      if (typeof val.inside === 'boolean') {
+        localStorage.setItem('pk_status_'+tc, val.inside ? 'inside' : 'outside');
+      }
+      if (val.tc && val.ad && val.soyad && val.pw) {
+        users.push({
+          id: val.id || Date.now().toString(),
+          tc: val.tc,
+          ad: val.ad,
+          soyad: val.soyad,
+          pw: val.pw,
+          admCreated: !!val.admCreated,
+          staticQrId: val.staticQrId || undefined
+        });
+      }
+      if (typeof val.staticQrId === 'string' && val.staticQrId.length) {
+        const i = users.findIndex(u => u.tc === tc);
+        if (i !== -1) users[i].staticQrId = val.staticQrId;
+      }
+    });
+    if (users.length) localStorage.setItem('pk_users', JSON.stringify(users));
+    refreshAdminUI();
   });
 }
 
@@ -2255,8 +2269,14 @@ const DB = {
     localStorage.setItem('pk_users', JSON.stringify(users));
     if (fdb) {
       const obj = {};
-      users.forEach(u => { obj[u.tc] = u; });
-      fdb.ref('pk/users').set(obj).catch(e => console.warn('saveUsers Firebase hata:', e.message));
+      users.forEach(u => {
+        obj[u.tc] = {
+          ...u,
+          inside: DB.getStatus(u.tc) === 'inside',
+          staticQrId: u.staticQrId || null
+        };
+      });
+      fdb.ref('users').set(obj).catch(e => console.warn('saveUsers Firebase hata:', e.message));
     }
   },
 
@@ -2270,21 +2290,37 @@ const DB = {
     try { return JSON.parse(localStorage.getItem('pk_entries')||'[]'); } catch { return []; }
   },
   addEntry: (entry) => {
+    if (!entry || !entry.photo) {
+      console.warn('addEntry engellendi: photo zorunlu');
+      return false;
+    }
     // Önce localStorage'a yaz (anlık göster)
-    const l = DB.getEntries(); l.push(entry);
+    const normalized = { ...entry, mode: entry.mode || entry.type, type: entry.type || entry.mode };
+    const l = DB.getEntries(); l.push(normalized);
     localStorage.setItem('pk_entries', JSON.stringify(l));
     // Firebase'e yaz
     if (fdb) {
       // Fotoğraf varsa sıkıştır (Firebase 10MB limit)
-      const e = { ...entry };
+      const e = { ...normalized };
       if (e.photo && e.photo.length > 100000) {
         e.photo = compressPhoto(e.photo, 320, 240, 0.45);
       }
-      fdb.ref('pk/entries/' + e.tc).push(e).catch(err => console.warn('addEntry Firebase hata:', err.message));
+      const logPayload = {
+        tc: e.tc,
+        timestamp: e.timestamp || Date.now(),
+        type: e.type || e.mode || 'entry',
+        photo: e.photo,
+        name: e.name || '',
+        mode: e.mode || e.type || 'entry',
+        time: e.time || new Date().toLocaleTimeString(lang==='en'?'en-GB':'tr-TR'),
+        source: e.source || 'qr'
+      };
+      fdb.ref('logs').push(logPayload).catch(err => console.warn('logs Firebase hata:', err.message));
     }
     // Aynı cihaz diğer sekmelere bildir
     if (bc) bc.postMessage({ type: 'entry_added' });
     refreshAdminUI(); updateRprPreview();
+    return true;
   },
 
   // ── QR ANAHTAR ──
@@ -2332,7 +2368,7 @@ const DB = {
   getStatus: (tc) => localStorage.getItem('pk_status_'+tc)||'outside',
   setStatus: (tc, s) => {
     localStorage.setItem('pk_status_'+tc, s);
-    if (fdb) fdb.ref('pk/status/'+tc).set(s).catch(e => console.warn('setStatus hata:', e.message));
+    if (fdb) fdb.ref('users/'+tc+'/inside').set(s === 'inside').catch(e => console.warn('users inside set hata:', e.message));
     if (bc) bc.postMessage({ type: 'status', tc, status: s });
   },
 };
@@ -2375,6 +2411,7 @@ let CU = null, qrStream = null, scanInt = null, scanning = false, kvkk = true;
 let scanMode = 'entry', waitPoll = null, lastQRData = '', lastQRTime = 0;
 let turCamStream = null, turCamOpen = false, turTimeLeft = 300, turCurrentKey = '';
 let turStarted = false, lastPendingId = null;
+let userQrRefreshInt = null;
 const DURATION = 300, CIRC = 2 * Math.PI * 35;
 
 // ═══════════════════════════════════════
@@ -2428,11 +2465,136 @@ function tcValid(tc) {
   if (d.slice(0,10).reduce((a,b)=>a+b,0) % 10 !== d[10]) return false;
   return true;
 }
-function hashPw(pw) { return btoa(unescape(encodeURIComponent(pw + '_pk'))); }
+const SECURITY_CONFIG = {
+  roles: {
+    admin: {
+      username: 'admin',
+      passwordHash: 'ba4344b5d824443e1472bb517c34672c46b5ffbf73337c15bbedf0c2240d81b7'
+    },
+    qradmin: {
+      username: 'qradmin',
+      passwordHash: 'ba4344b5d824443e1472bb517c34672c46b5ffbf73337c15bbedf0c2240d81b7'
+    }
+  }
+};
+async function sha256Hex(input) {
+  const enc = new TextEncoder().encode(input);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function hashPw(pw) { return sha256Hex(pw); }
 function fmtTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
 function genKey() {
   const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   return Array.from({length:20}, () => c[Math.floor(Math.random()*c.length)]).join('');
+}
+// Hybrid QR core:
+// - dynamic_user: single-use + time-limited (phone)
+// - admin_card: static card QR validated against DB
+let dynamicQrSession = null;
+function createQrId() {
+  return 'qr_' + Date.now().toString(36) + '_' + genKey();
+}
+function getQrSessionsMap() {
+  try { return JSON.parse(localStorage.getItem('pk_qr_sessions') || '{}'); } catch { return {}; }
+}
+function saveQrSessionsMap(map) {
+  localStorage.setItem('pk_qr_sessions', JSON.stringify(map || {}));
+}
+function getQrSession(qrId) {
+  if (!qrId) return null;
+  const map = getQrSessionsMap();
+  return map[qrId] || null;
+}
+function setQrSession(session) {
+  if (!session || !session.qrId) return;
+  const map = getQrSessionsMap();
+  map[session.qrId] = session;
+  saveQrSessionsMap(map);
+  if (fdb) fdb.ref('qrSessions/' + session.qrId).set(session).catch(e => console.warn('qrSession set hata:', e.message));
+}
+function markQrSessionUsed(qrId) {
+  const s = getQrSession(qrId);
+  if (!s) return;
+  s.used = true;
+  s.usedAt = Date.now();
+  setQrSession(s);
+}
+function ensureDynamicUserQrSession(user) {
+  const now = Date.now();
+  if (dynamicQrSession && dynamicQrSession.tc === user.tc && !dynamicQrSession.used && (dynamicQrSession.expiresAt || 0) > now) {
+    return dynamicQrSession;
+  }
+  const qrId = createQrId();
+  const session = {
+    qrId,
+    tc: user.tc,
+    qrType: 'dynamic_user',
+    isStatic: false,
+    used: false,
+    createdAt: now,
+    expiresAt: now + 60000
+  };
+  dynamicQrSession = session;
+  setQrSession(session);
+  return session;
+}
+function ensureStaticCardQrSession(tc) {
+  const users = DB.getUsers();
+  const i = users.findIndex(u => u.tc === tc);
+  if (i === -1) return null;
+  const u = users[i];
+  if (u.staticQrId) {
+    const existing = getQrSession(u.staticQrId);
+    if (existing && existing.qrType === 'admin_card') return existing;
+  }
+  const qrId = createQrId();
+  const session = {
+    qrId,
+    tc,
+    qrType: 'admin_card',
+    isStatic: true,
+    used: false,
+    createdAt: Date.now(),
+    active: true
+  };
+  users[i].staticQrId = qrId;
+  DB.saveUsers(users);
+  if (fdb) fdb.ref('users/' + tc + '/staticQrId').set(qrId).catch(()=>{});
+  setQrSession(session);
+  return session;
+}
+function buildUserQrPayload(user) {
+  const session = ensureDynamicUserQrSession(user);
+  return session ? session.qrId : '';
+}
+function ensureUserQrBox() {
+  let box = document.getElementById('user-qr-box');
+  if (box) return box;
+  const scanBox = document.querySelector('#s-scan .scan-box');
+  if (!scanBox) return null;
+  box = document.createElement('div');
+  box.id = 'user-qr-box';
+  box.style.cssText = 'margin-top:12px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.14);border-radius:16px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px;';
+  box.innerHTML = '<div id="user-qr-canvas" style="background:#fff;border-radius:12px;padding:10px;min-height:170px;display:flex;align-items:center;justify-content:center;"></div><div id="user-qr-note" style="font-size:11px;color:rgba(255,255,255,.7);font-weight:700;text-align:center;">Kisisel QR kodunuzu turnikeye okutun</div>';
+  scanBox.appendChild(box);
+  return box;
+}
+function renderUserQR() {
+  if (!CU) return;
+  const box = ensureUserQrBox();
+  if (!box) return;
+  const qrWrap = document.getElementById('user-qr-canvas');
+  if (!qrWrap) return;
+  qrWrap.innerHTML = '';
+  new QRCode(qrWrap, {
+    text: buildUserQrPayload(CU),
+    width: 160,
+    height: 160,
+    colorDark: '#0f172a',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
 }
 
 // ═══════════════════════════════════════
@@ -2479,10 +2641,12 @@ function setRole(role) {
   }
 }
 
-function doAdminLogin() {
+async function doAdminLogin() {
   const user = document.getElementById('adm-user').value.trim();
   const pw = document.getElementById('adm-pw').value;
-  if (user !== 'parkilit_admin' || pw !== 'ParK!l1t@2025') {
+  const ph = await sha256Hex(pw);
+  const conf = SECURITY_CONFIG.roles.admin;
+  if (user !== conf.username || ph !== conf.passwordHash) {
     showErr('adm-err', t('err_admin')); return;
   }
   load(true);
@@ -2494,10 +2658,12 @@ function doAdminLogin() {
   }, 500);
 }
 
-function doTurnikeLogin() {
+async function doTurnikeLogin() {
   const user = document.getElementById('adm-user').value.trim();
   const pw = document.getElementById('adm-pw').value;
-  if (user !== 'parkilit_admin' || pw !== 'TuRn!Ke#99') {
+  const ph = await sha256Hex(pw);
+  const conf = SECURITY_CONFIG.roles.qradmin;
+  if (user !== conf.username || ph !== conf.passwordHash) {
     showErr('adm-err', t('err_admin')); return;
   }
   load(true);
@@ -2509,7 +2675,7 @@ function doTurnikeLogin() {
   }, 500);
 }
 
-function doReg() {
+async function doReg() {
   const ad = document.getElementById('r-ad').value.trim();
   const soyad = document.getElementById('r-soyad').value.trim();
   const tc = document.getElementById('r-tc').value.trim();
@@ -2523,8 +2689,9 @@ function doReg() {
   const users = DB.getUsers();
   if (users.find(u => u.tc === tc)) return showErr('reg-err', t('err_exists'));
   load(true);
+  const pwHash = await hashPw(pw);
   setTimeout(() => {
-    const user = { id: Date.now().toString(), ad, soyad, tc, pw: hashPw(pw) };
+    const user = { id: Date.now().toString(), ad, soyad, tc, pw: pwHash };
     users.push(user); DB.saveUsers(users); DB.saveSession(user); CU = user;
     DB.setStatus(tc, 'outside'); scanMode = 'entry';
     load(false);
@@ -2533,22 +2700,23 @@ function doReg() {
   }, 600);
 }
 
-function doLogin() {
+async function doLogin() {
   const tc = document.getElementById('l-tc').value.trim();
   const pw = document.getElementById('l-pw').value;
   if (!tcValid(tc)) return showErr('login-err', t('err_tc_only'));
   if (!pw) return showErr('login-err', t('err_pw_only'));
   load(true);
 
+  const pwHash = await hashPw(pw);
   function tryLogin() {
-    const user = DB.getUsers().find(u => u.tc === tc && u.pw === hashPw(pw));
+    const user = DB.getUsers().find(u => u.tc === tc && u.pw === pwHash);
     load(false);
     if (!user) return showErr('login-err', t('err_creds'));
     CU = user; DB.saveSession(user);
     // Firebase'den anlık durumu al
     if (fdb) {
-      fdb.ref('pk/status/'+tc).once('value', snap => {
-        const st = snap.val() || 'outside';
+      fdb.ref('users/'+tc+'/inside').once('value', snap => {
+        const st = snap.val() ? 'inside' : 'outside';
         localStorage.setItem('pk_status_'+tc, st);
         scanMode = st === 'inside' ? 'exit' : 'entry';
         setupScanUI(); navigate('/app/scan'); startQRCam();
@@ -2567,10 +2735,18 @@ function doLogin() {
 
   // Firebase varsa önce sync et
   if (fdb) {
-    fdb.ref('pk/users').once('value', snap => {
+    fdb.ref('users').once('value', snap => {
       const data = snap.val();
       if (data) {
-        const users = Object.values(data);
+        const users = Object.values(data).filter(Boolean).map(v => ({
+          id: v.id || Date.now().toString(),
+          tc: v.tc,
+          ad: v.ad,
+          soyad: v.soyad,
+          pw: v.pw,
+          admCreated: !!v.admCreated,
+          staticQrId: v.staticQrId || undefined
+        }));
         localStorage.setItem('pk_users', JSON.stringify(users));
       }
       tryLogin();
@@ -2676,21 +2852,24 @@ window.autoFillName = () => {
   const u = DB.getUsers().find(u => u.tc === tc);
   if (u) { document.getElementById('gen-ad').value = u.ad; document.getElementById('gen-soyad').value = u.soyad; }
 };
-window.generateCard = () => {
+window.generateCard = async () => {
   const tc = document.getElementById('gen-tc').value.trim();
   const ad = document.getElementById('gen-ad').value.trim();
   const soyad = document.getElementById('gen-soyad').value.trim();
   if (!tcValid(tc)) { showErr('gen-err', t('err_tc')); return; }
   if (!ad || !soyad) { showErr('gen-err', t('err_name')); return; }
+  const staticSession = ensureStaticCardQrSession(tc);
+  if (!staticSession) { showErr('gen-err', 'Kart QR olusturulamadi'); return; }
   document.getElementById('card-qr').innerHTML = '';
-  new QRCode(document.getElementById('card-qr'), { text:'PARKILIT_CARD|'+tc+'|'+ad+' '+soyad, width:68, height:68, colorDark:'#1e293b', colorLight:'#fff', correctLevel:QRCode.CorrectLevel.H });
+  new QRCode(document.getElementById('card-qr'), { text: staticSession.qrId, width:68, height:68, colorDark:'#1e293b', colorLight:'#fff', correctLevel:QRCode.CorrectLevel.H });
   document.getElementById('cp-name').textContent = ad + ' ' + soyad;
   document.getElementById('cp-tc').textContent = tc.substring(0,3) + ' *** ' + tc.slice(-4);
   document.getElementById('cp-date').textContent = new Date().toLocaleDateString(lang==='en'?'en-GB':'tr-TR');
   document.getElementById('gen-preview').classList.add('visible');
   const users = DB.getUsers();
   if (!users.find(u => u.tc === tc)) {
-    users.push({ id: Date.now().toString(), ad, soyad, tc, pw: hashPw('park123'), admCreated: true });
+    const defaultHash = await hashPw('park123');
+    users.push({ id: Date.now().toString(), ad, soyad, tc, pw: defaultHash, admCreated: true });
     DB.saveUsers(users); DB.setStatus(tc, 'outside');
     toast('✅', ad + ' ' + soyad + ' ' + t('gen_added'), 5000);
     refreshAdminUI();
@@ -2747,8 +2926,7 @@ window.adminDeleteUser = (tc, name) => {
   DB.saveUsers(users);
   DB.setStatus(tc, 'outside');
   if (fdb) {
-    fdb.ref('pk/users/' + tc).remove().catch(()=>{});
-    fdb.ref('pk/status/' + tc).remove().catch(()=>{});
+    fdb.ref('users/' + tc).remove().catch(()=>{});
   }
   refreshAdminUI();
   toast('🗑️', name + ' sistemden silindi.', 3000);
@@ -2757,7 +2935,7 @@ window.adminDeleteUser = (tc, name) => {
 window.adminClearAllEntries = () => {
   if (!confirm('Tüm giriş/çıkış kayıtlarını silmek istediğine emin misin?\n\nBu işlem geri alınamaz!')) return;
   localStorage.setItem('pk_entries', '[]');
-  if (fdb) fdb.ref('pk/entries').remove().catch(()=>{});
+  if (fdb) fdb.ref('logs').remove().catch(()=>{});
   refreshAdminUI(); updateRprPreview();
   toast('🗑️', 'Tüm kayıtlar silindi.', 3000);
 };
@@ -2827,50 +3005,28 @@ window.exportJSON = () => {
 function startTurnikeSystem() {
   if (turStarted) return;
   turStarted = true;
-  document.getElementById('tur-rfg').style.strokeDasharray = CIRC;
-  genTurQR(); updateTurTimer();
-  setInterval(() => {
-    turTimeLeft--;
-    if (turTimeLeft < 0) { turTimeLeft = DURATION; genTurQR(); }
-    updateTurTimer();
-  }, 1000);
+  const q = document.getElementById('tur-qrcode');
+  if (q) q.innerHTML = '<div style="width:220px;height:220px;border-radius:14px;border:2px dashed rgba(79,163,247,.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:rgba(255,255,255,.75);text-align:center;padding:14px;">Turnike QR URETMEZ<br>Sadece QR tarar</div>';
+  const m = document.getElementById('tur-manuel-code');
+  if (m) m.textContent = 'SCAN';
+  const timerText = document.getElementById('tur-tv');
+  if (timerText) timerText.textContent = '--:--';
+  const rfg = document.getElementById('tur-rfg');
+  if (rfg) rfg.style.strokeDasharray = CIRC;
+  const pfill = document.getElementById('tur-pfill');
+  if (pfill) pfill.style.width = '0%';
   setInterval(() => {
     const c = document.getElementById('tur-clock');
     if (c) c.textContent = new Date().toLocaleTimeString(lang === 'en' ? 'en-GB' : 'tr-TR');
   }, 1000);
-  setInterval(pollPendingLocal, 500);
 }
 
 function genTurQR() {
-  const ov = document.getElementById('tur-qov');
-  if (ov) ov.classList.add('on');
-  setTimeout(() => {
-    turCurrentKey = genKey();
-    const ts = Date.now();
-    const el = document.getElementById('tur-qrcode');
-    if (!el) return;
-    el.innerHTML = '';
-    new QRCode(el, { text: 'PARKILIT|'+turCurrentKey+'|'+ts, width: 220, height: 220, colorDark: '#1e293b', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.H });
-    const mc = turCurrentKey.substring(0, 6);
-    const mcEl = document.getElementById('tur-manuel-code');
-    if (mcEl) mcEl.textContent = mc;
-    DB.setQR({ key: turCurrentKey, ts, mc, expiresAt: ts + 300000 });
-    if (ov) ov.classList.remove('on');
-  }, 400);
+  // Turnstile does not generate QR codes.
 }
 
 function updateTurTimer() {
-  const ratio = turTimeLeft / DURATION;
-  const rfg = document.getElementById('tur-rfg');
-  if (!rfg) return;
-  rfg.style.strokeDashoffset = CIRC * (1 - ratio);
-  const tv = document.getElementById('tur-tv');
-  if (tv) tv.textContent = fmtTime(turTimeLeft);
-  const pf = document.getElementById('tur-pfill');
-  if (pf) pf.style.width = (ratio*100) + '%';
-  if (turTimeLeft <= 30) rfg.className = 'trfg danger';
-  else if (turTimeLeft <= 60) rfg.className = 'trfg warn';
-  else rfg.className = 'trfg';
+  // Timer is disabled because turnstile QR generation is removed.
 }
 
 window.toggleTurCam = async () => {
@@ -2896,6 +3052,7 @@ window.toggleTurCam = async () => {
       const btn = document.getElementById('tur-cam-btn');
       if (btn) { btn.innerHTML = '<span class="live-dot"></span>' + t('tur_cam_close'); btn.className = 'tur-cam-toggle on'; }
       const sl = document.getElementById('tur-scan-line'); if (sl) sl.classList.add('active');
+      startAdminCardScan();
       toast('📷', t('toast_cam_open'), 3000);
     } catch(e) { toast('⚠️', t('toast_cam_denied')); }
   }
@@ -2903,6 +3060,7 @@ window.toggleTurCam = async () => {
 
 function stopTurCam() {
   if (turCamStream) { turCamStream.getTracks().forEach(t=>t.stop()); turCamStream = null; turCamOpen = false; }
+  stopAdminCardScan();
 }
 
 function captureTurPhoto() {
@@ -2914,6 +3072,14 @@ function captureTurPhoto() {
   ctx.save(); ctx.translate(c.width, 0); ctx.scale(-1, 1);
   ctx.drawImage(v, 0, 0, c.width, c.height); ctx.restore();
   return c.toDataURL('image/jpeg', 0.5);
+}
+async function captureTurPhotoWithRetry(maxTry = 3, waitMs = 220) {
+  for (let i = 0; i < maxTry; i++) {
+    const photo = captureTurPhoto();
+    if (photo) return photo;
+    await new Promise(r => setTimeout(r, waitMs));
+  }
+  return null;
 }
 
 // Admin kamerası — üye kart QR'ı okuma
@@ -2933,7 +3099,7 @@ function startAdminCardScan() {
   if (!turCamOpen) { toast('⚠️', 'Önce kamerayı açın!', 3000); return; }
   adminCardScanActive = true;
   const btn = document.getElementById('admin-card-scan-btn');
-  if (btn) { btn.textContent = '⏹ Taramayı Durdur'; btn.style.background = 'var(--red-l)'; btn.style.color = 'var(--red)'; }
+  if (btn) { btn.textContent = '⏹ QR Taramayi Durdur'; btn.style.background = 'var(--red-l)'; btn.style.color = 'var(--red)'; }
   adminCardScanInterval = setInterval(() => {
     const v = document.getElementById('tur-vid');
     const c = document.getElementById('adm-cap-cvs');
@@ -2944,13 +3110,33 @@ function startAdminCardScan() {
     ctx.drawImage(v, 0, 0, c.width, c.height); ctx.restore();
     const imgData = ctx.getImageData(0, 0, c.width, c.height);
     const code = jsQR(imgData.data, c.width, c.height, {inversionAttempts:'attemptBoth'});
-    if (code && code.data && code.data.startsWith('PARKILIT_CARD|')) {
-      const parts = code.data.split('|');
+    if (!code || !code.data) return;
+    const data = code.data.trim();
+    // Hybrid QR validation entry point:
+    // - preferred: qrId only
+    // - legacy fallback: PARKILIT_CARD / PARKILIT_USER
+    if (!data.includes('|')) {
+      stopAdminCardScan();
+      validateAndProcessQrId(data);
+      return;
+    }
+    if (data.startsWith('PARKILIT_CARD|')) {
+      const parts = data.split('|');
       if (parts.length >= 3) {
         const tc = parts[1];
         const name = parts[2];
         stopAdminCardScan();
         handleAdminCardEntry(tc, name);
+      }
+      return;
+    }
+    if (data.startsWith('PARKILIT_USER|')) {
+      const parts = data.split('|');
+      if (parts.length >= 3) {
+        const tc = parts[1];
+        const qrid = parts[2];
+        stopAdminCardScan();
+        validateAndProcessQrId(qrid, tc);
       }
     }
   }, 200);
@@ -2960,7 +3146,7 @@ function stopAdminCardScan() {
   adminCardScanActive = false;
   clearInterval(adminCardScanInterval);
   const btn = document.getElementById('admin-card-scan-btn');
-  if (btn) { btn.textContent = '🪪 Kart QR Oku'; btn.style.background = 'var(--blue-l)'; btn.style.color = 'var(--blue)'; }
+  if (btn) { btn.textContent = '📷 QR Tara'; btn.style.background = 'var(--blue-l)'; btn.style.color = 'var(--blue)'; }
 }
 
 function handleAdminCardEntry(tc, name) {
@@ -2968,21 +3154,82 @@ function handleAdminCardEntry(tc, name) {
   let users = DB.getUsers();
   let user = users.find(u => u.tc === tc);
   if (!user) { toast('⚠️', tc + ' TC ile kayıtlı kullanıcı bulunamadı.', 4000); return; }
+  processTurnikeAccess(tc, name, 'card_scan');
+}
+
+function handleTurnikeUserQR(tc, qrId) {
+  const users = DB.getUsers();
+  const user = users.find(u => u.tc === tc);
+  if (!user) { toast('⚠️', 'Gecersiz kullanici QR kodu.', 3500); return; }
+  const qr = getQrSession(qrId);
+  if (!qr || qr.tc !== tc) { toast('⚠️', 'Sahte veya gecersiz QR kodu.', 3500); return; }
+  const realName = (user.ad + ' ' + user.soyad).trim();
+  processTurnikeAccess(tc, realName, 'user_qr');
+}
+
+function validateAndProcessQrId(qrId, expectedTc = null) {
+  const s = getQrSession(qrId);
+  if (!s || !s.tc) { toast('⚠️', 'Bilinmeyen QR kodu.', 3500); startAdminCardScan(); return; }
+  if (expectedTc && s.tc !== expectedTc) { toast('⚠️', 'QR TC eslesmedi.', 3500); startAdminCardScan(); return; }
+  const user = DB.getUsers().find(u => u.tc === s.tc);
+  if (!user) { toast('⚠️', 'QR kullanicisi bulunamadi.', 3500); startAdminCardScan(); return; }
+  if (s.qrType === 'dynamic_user') {
+    if (s.used) { toast('⚠️', 'Bu dinamik QR zaten kullanilmis.', 3500); startAdminCardScan(); return; }
+    if ((s.expiresAt || 0) < Date.now()) { toast('⚠️', 'Dinamik QR suresi dolmus.', 3500); startAdminCardScan(); return; }
+  } else if (s.qrType === 'admin_card') {
+    if (s.active === false) { toast('⚠️', 'Kart QR devre disi.', 3500); startAdminCardScan(); return; }
+  } else {
+    toast('⚠️', 'Desteklenmeyen QR tipi.', 3500); startAdminCardScan(); return;
+  }
+  const fullName = (user.ad + ' ' + user.soyad).trim();
+  processTurnikeAccess(s.tc, fullName, s.qrType, s);
+}
+
+let turnikeLock = false;
+async function processTurnikeAccess(tc, name, source, qrSession = null) {
+  if (turnikeLock) { toast('⚠️', 'Turnike islemde, lutfen bekleyin.', 2000); return; }
+  turnikeLock = true;
   const st = DB.getStatus(tc);
   const mode = st === 'inside' ? 'exit' : 'entry';
-  // Fotoğraf çek
-  const photo = captureTurPhoto();
+  if (mode === 'entry' && st === 'inside') { toast('⚠️', 'Kullanici zaten iceride.', 3000); turnikeLock = false; return; }
+  if (mode === 'exit' && st === 'outside') { toast('⚠️', 'Kullanici zaten disarida.', 3000); turnikeLock = false; return; }
+  const photo = await captureTurPhotoWithRetry(3, 250);
+  if (!photo) {
+    toast('❌', 'Fotograf alinamadi. Islem iptal edildi.', 4000);
+    turnikeLock = false;
+    startAdminCardScan();
+    return;
+  }
   if (photo) {
     const img = document.getElementById(mode==='exit'?'tur-lp-out':'tur-lp-in');
     const slot = document.getElementById(mode==='exit'?'tps-out':'tps-in');
     if (img) { img.src = photo; img.classList.add('loaded'); }
     if (slot) slot.querySelectorAll('span').forEach(s => s.style.display='none');
   }
-  const entry = { mode, tc, name, time: new Date().toLocaleTimeString(lang==='en'?'en-GB':'tr-TR'), timestamp: Date.now(), photo, source: 'card_scan' };
-  DB.addEntry(entry); DB.setStatus(tc, mode==='exit'?'outside':'inside');
+  const entry = {
+    mode,
+    type: mode,
+    tc,
+    name,
+    time: new Date().toLocaleTimeString(lang==='en'?'en-GB':'tr-TR'),
+    timestamp: Date.now(),
+    photo,
+    source
+  };
+  const ok = DB.addEntry(entry);
+  if (!ok) {
+    toast('❌', 'Log kaydi olusturulamadi. Islem iptal edildi.', 4000);
+    turnikeLock = false;
+    startAdminCardScan();
+    return;
+  }
+  DB.setStatus(tc, mode==='exit'?'outside':'inside');
+  if (qrSession && qrSession.qrType === 'dynamic_user') markQrSessionUsed(qrSession.qrId);
   showTkOv(entry, photo);
   toast(mode==='exit'?'🚪':'✅', name + (mode==='exit'?' çıkış yaptı.'  :' giriş yaptı.'), 4000);
   turFlash();
+  turnikeLock = false;
+  startAdminCardScan();
 }
 
 function turFlash() {
@@ -3006,6 +3253,11 @@ function handleTurnikePending(p) {
   setTimeout(() => {
     let photo = null;
     if (turCamOpen) { turFlash(); photo = captureTurPhoto(); showTurDet(p.mode, p.name); }
+    if (!photo) {
+      DB.clearPending();
+      toast('❌', 'Fotograf zorunlu. Islem bloklandi.', 3500);
+      return;
+    }
     if (photo) {
       const img = document.getElementById(p.mode==='exit'?'tur-lp-out':'tur-lp-in');
       const slot = document.getElementById(p.mode==='exit'?'tps-out':'tps-in');
@@ -3064,9 +3316,9 @@ function setupScanUI() {
   const scanSub = document.getElementById('scan-sub');
   const scanHint = document.getElementById('scan-hint');
   const sstTxt = document.getElementById('sst-txt');
-  if (scanTitle) scanTitle.textContent = t(x?'scan_exit_title':'scan_entry_title');
-  if (scanSub) scanSub.textContent = t(x?'scan_exit_sub':'scan_entry_sub');
-  if (scanHint) scanHint.textContent = t(x?'scan_exit_hint':'scan_entry_hint');
+  if (scanTitle) scanTitle.textContent = 'Kisisel QR Kod';
+  if (scanSub) scanSub.textContent = 'Turnike kamerasi bu QR kodu okuyarak giris/cikis yapar';
+  if (scanHint) scanHint.textContent = 'QR kodunu turnikeye gosterin';
   if (sstTxt) sstTxt.textContent = t(x?'scan_exit_scanning':'scan_scanning');
   ['sc-tl','sc-tr','sc-bl','sc-br'].forEach(id => {
     const el = document.getElementById(id);
@@ -3083,55 +3335,31 @@ function setupScanUI() {
   const sst = document.getElementById('sst');
   if (sst) sst.className = 'sst ' + (x?'xon':'on');
   const be = document.getElementById('btn-entry'), bx = document.getElementById('btn-exit');
-  if (be) { be.className = 'smb in-btn' + (x?'':' active-smb'); be.style.opacity = st==='inside'?'0.4':'1'; }
-  if (bx) { bx.className = 'smb out-btn' + (x?' active-smb':''); bx.style.opacity = st==='outside'?'0.4':'1'; }
+  if (be) { be.className = 'smb in-btn' + (x?'':' active-smb'); be.style.opacity = '0.45'; be.disabled = true; }
+  if (bx) { bx.className = 'smb out-btn' + (x?' active-smb':''); bx.style.opacity = '0.45'; bx.disabled = true; }
+  renderUserQR();
 }
 
 window.switchMode = (mode) => {
-  const st = DB.getStatus(CU ? CU.tc : '');
-  if (mode==='entry' && st==='inside') { toast('⚠️', t('toast_already_in'), 3500); return; }
-  if (mode==='exit'  && st==='outside'){ toast('⚠️', t('toast_already_out'), 3500); return; }
-  scanMode = mode; setupScanUI();
+  toast('ℹ️', 'Giris/cikis modu turnike dogrulamasi ile otomatik belirlenir.', 3000);
 };
 
 async function startQRCam() {
-  try {
-    // Önce arka kamera dene, olmazsa herhangi bir kamera
-    const constraints = {
-      video: {
-        facingMode: { ideal: 'environment' },
-        width:  { min: 480, ideal: 1280, max: 1920 },
-        height: { min: 480, ideal: 720,  max: 1080 },
-        frameRate: { ideal: 30, max: 60 },
-        focusMode: 'continuous',
-        zoom: 1.0,
-      }
-    };
-    try {
-      qrStream = await navigator.mediaDevices.getUserMedia(constraints);
-    } catch(e1) {
-      // Fallback
-      qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    }
-    const v = document.getElementById('vid');
-    v.srcObject = qrStream;
-    v.setAttribute('playsinline', true);
-    v.onloadedmetadata = () => {
-      v.play();
-      scanning = true; lastQRData = '';
-      clearInterval(scanInt);
-      // Cihaz hızına göre frame rate ayarla
-      const fps = v.videoWidth > 1000 ? 150 : 100; // Yüksek çözünürlükte daha sık tara
-      scanInt = setInterval(frame, fps);
-    };
-  } catch(e) {
-    toast('⚠️', t('toast_cam_denied'));
+  stopQRCam();
+  const v = document.getElementById('vid');
+  if (v) {
+    v.style.display = 'none';
+    try { v.srcObject = null; } catch(e) {}
   }
+  renderUserQR();
+  clearInterval(userQrRefreshInt);
+  userQrRefreshInt = setInterval(renderUserQR, 15000);
 }
 
 function stopQRCam() {
   if (qrStream) { qrStream.getTracks().forEach(t=>t.stop()); qrStream = null; }
   clearInterval(scanInt); scanning = false;
+  clearInterval(userQrRefreshInt);
 }
 
 // QR okuma için özel canvas ve context — her frame yeniden oluşturma
@@ -3172,59 +3400,7 @@ function frame() {
 }
 
 function handleQR(data) {
-  if (!scanning) return;
-  scanning = false; clearInterval(scanInt);
-  const parts = data.split('|');
-  if (parts.length !== 3 || parts[0] !== 'PARKILIT') {
-    document.getElementById('err-desc').textContent = t('err_not_parkilit');
-    stopQRCam(); navigate('/app/error'); return;
-  }
-  const ts = parseInt(parts[2]), diff = Date.now() - ts;
-  if (isNaN(ts) || diff > 300000) {
-    document.getElementById('err-desc').textContent = t('err_expired');
-    stopQRCam(); navigate('/app/error'); return;
-  }
-  const st = DB.getStatus(CU.tc);
-  if (scanMode==='entry' && st==='inside') {
-    document.getElementById('err-desc').textContent = t('err_already_in');
-    stopQRCam(); navigate('/app/error'); return;
-  }
-  if (scanMode==='exit' && st==='outside') {
-    document.getElementById('err-desc').textContent = t('err_already_out');
-    stopQRCam(); navigate('/app/error'); return;
-  }
-
-  stopQRCam();
-  if (navigator.vibrate) navigator.vibrate([60,30,120]);
-  const now = new Date(), saat = now.toLocaleTimeString(lang==='en'?'en-GB':'tr-TR');
-  const entry = { mode: scanMode, tc: CU.tc, name: CU.ad+' '+CU.soyad, time: saat, timestamp: Date.now(), photo: null };
-  DB.clearResult(); DB.setPending(entry);
-  const started = Date.now();
-  clearInterval(waitPoll);
-
-  window._resultHandler = (res) => {
-    clearInterval(waitPoll);
-    DB.clearResult(); DB.clearPending();
-    DB.addEntry(res); DB.setStatus(CU.tc, scanMode==='exit'?'outside':'inside');
-    showSuccess(res);
-  };
-
-  waitPoll = setInterval(() => {
-    const res = DB.getResult();
-    if (res && res.tc === CU.tc) {
-      clearInterval(waitPoll); window._resultHandler = null;
-      DB.clearResult(); DB.clearPending();
-      DB.addEntry(res); DB.setStatus(CU.tc, scanMode==='exit'?'outside':'inside');
-      showSuccess(res);
-    } else if (Date.now() - started >= 3500) {
-      clearInterval(waitPoll); window._resultHandler = null;
-      DB.clearPending(); DB.addEntry(entry);
-      DB.setStatus(CU.tc, scanMode==='exit'?'outside':'inside');
-      showSuccess(entry);
-    }
-  }, 200);
-
-  showSuccess(entry);
+  // User-side camera scanning removed. Turnstile is the only QR scanner.
 }
 
 function showSuccess(entry) {
@@ -3263,35 +3439,7 @@ window.toggleManuel = () => {
   if (w.classList.contains('open')) setTimeout(() => document.getElementById('manuel-inp').focus(), 350);
 };
 window.doManuel = () => {
-  const code = document.getElementById('manuel-inp').value.trim().toUpperCase();
-  if (code.length < 4) { toast('⚠️', t('toast_min_chars')); return; }
-  const st = DB.getStatus(CU.tc);
-  if (scanMode==='entry' && st==='inside') { toast('⚠️', t('toast_already_in'), 3500); return; }
-  if (scanMode==='exit'  && st==='outside'){ toast('⚠️', t('toast_already_out'), 3500); return; }
-  const qrData = DB.getQR();
-  if (!qrData) { toast('❌', t('toast_no_qr')); return; }
-  if (Date.now() - qrData.ts > 300000) { toast('❌', t('toast_qr_expired')); return; }
-  const mc = (qrData.mc || qrData.key.substring(0,6)).toUpperCase();
-  if (!mc.startsWith(code.substring(0, Math.min(code.length, 6)))) { toast('❌', t('toast_wrong_code')); return; }
-  document.getElementById('manuel-inp').value = '';
-  document.getElementById('manuel-wrap').classList.remove('open');
-  scanning = false; clearInterval(scanInt); stopQRCam();
-  if (navigator.vibrate) navigator.vibrate([60,30,120]);
-  const now = new Date(), saat = now.toLocaleTimeString(lang==='en'?'en-GB':'tr-TR');
-  const entry = { mode: scanMode, tc: CU.tc, name: CU.ad+' '+CU.soyad, time: saat, timestamp: Date.now(), photo: null, source: 'manuel' };
-  DB.clearResult(); DB.setPending(entry);
-  const started = Date.now(); clearInterval(waitPoll);
-  waitPoll = setInterval(() => {
-    const res = DB.getResult();
-    if (res && res.tc === CU.tc) {
-      clearInterval(waitPoll); DB.clearResult(); DB.clearPending();
-      DB.addEntry(res); DB.setStatus(CU.tc, scanMode==='exit'?'outside':'inside'); showSuccess(res);
-    } else if (Date.now()-started >= 3500) {
-      clearInterval(waitPoll); DB.clearPending();
-      DB.addEntry(entry); DB.setStatus(CU.tc, scanMode==='exit'?'outside':'inside'); showSuccess(entry);
-    }
-  }, 200);
-  showSuccess(entry);
+  toast('ℹ️', 'Manuel kod akisi kaldirildi. Kisisel veya admin kart QR okutun.', 3500);
 };
 
 // CONFETTI
