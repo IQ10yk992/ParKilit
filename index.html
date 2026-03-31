@@ -1502,6 +1502,11 @@ html { scroll-padding-top: 72px; }
     </div>
     <div class="adm-card">
       <div class="adm-card-hdr"><div class="adm-card-ttl" data-t="card_users"></div><span class="badge badge-b" id="badge-users">0</span></div>
+      <div style="padding:10px 12px 0;">
+        <button onclick="adminDeleteAllUsersOnce()" style="width:100%;background:var(--red-l);color:var(--red);border:1.5px solid rgba(239,68,68,.25);border-radius:10px;padding:9px 11px;font-family:var(--sans);font-size:12px;font-weight:800;cursor:pointer;">
+          ⚠️ Tüm Kullanıcıları Sil (Tek Sefer)
+        </button>
+      </div>
       <div class="log-list" id="user-list"><div class="log-empty" data-t="no_users"></div></div>
     </div>
     <div class="adm-card">
@@ -3008,6 +3013,37 @@ window.adminDeleteUser = (tc, name) => {
   }
   refreshAdminUI();
   toast('🗑️', name + ' sistemden silindi.', 3000);
+};
+
+window.adminDeleteAllUsersOnce = () => {
+  const alreadyDone = localStorage.getItem('pk_admin_delete_all_users_done') === '1';
+  if (alreadyDone) {
+    toast('ℹ️', 'Bu tek seferlik işlem zaten kullanıldı.', 3500);
+    return;
+  }
+  if (!confirm('TÜM kullanıcıları sistemden silmek istediğine emin misin?\n\nBu işlem tek seferliktir ve geri alınamaz.')) return;
+  const code = prompt('Onay için SIL yazın:');
+  if (code !== 'SIL') {
+    toast('⚠️', 'İşlem iptal edildi.', 2500);
+    return;
+  }
+
+  // Local users and inside/outside cache cleanup
+  localStorage.setItem('pk_users', '[]');
+  Object.keys(localStorage).forEach(k => {
+    if (k.startsWith('pk_status_')) localStorage.removeItem(k);
+  });
+
+  // Firebase cleanup for users and QR mappings
+  if (fdb) {
+    fdb.ref('users').remove().catch(()=>{});
+    fdb.ref('qrSessions').remove().catch(()=>{});
+  }
+
+  // Lock this action as one-time
+  localStorage.setItem('pk_admin_delete_all_users_done', '1');
+  refreshAdminUI();
+  toast('🗑️', 'Tüm kullanıcılar silindi. (Tek seferlik işlem tamamlandı)', 4500);
 };
 
 window.adminClearAllEntries = () => {
