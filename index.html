@@ -198,6 +198,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,22,40,.92
 .hero-badge-txt{font-size:12px;font-weight:700;color:var(--blue2);letter-spacing:.08em;text-transform:uppercase;}
 .hero-title{font-family:var(--head);font-size:clamp(38px,5vw,58px);font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.03em;margin-bottom:18px;}
 .hero-title .hl{background:linear-gradient(135deg,var(--blue2),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-slogan{font-size:13px;font-style:italic;color:rgba(255,255,255,.5);margin-top:10px;max-width:480px;line-height:1.6;border-left:2px solid rgba(255,255,255,.15);padding-left:12px;}
 .hero-desc{font-size:17px;color:rgba(255,255,255,.65);line-height:1.75;margin-bottom:32px;max-width:500px;}
 .hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
 .hbtn{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:14px;font-family:var(--sans);font-size:15px;font-weight:800;text-decoration:none;border:none;cursor:pointer;transition:all .2s;}
@@ -950,6 +951,7 @@ html { scroll-padding-top: 72px; }
       <span class="nav-link" onclick="scrollToSection('future')" data-t="nav_future"></span>
       <span class="nav-link" onclick="scrollToSection('impectia')" style="color:rgba(255,255,255,.65)">Impectia</span>
       <span class="nav-link" onclick="scrollToSection('parks')" style="color:rgba(255,255,255,.65)">Parklar</span>
+      <span class="nav-link" onclick="scrollToSection('model3d')" style="color:rgba(255,255,255,.65)">3D</span>
       </div>
     <div class="nav-right">
       <div class="lang-row">
@@ -976,6 +978,7 @@ html { scroll-padding-top: 72px; }
       <div class="hero-badge"><div class="hero-badge-dot"></div><span class="hero-badge-txt" data-t="hero_badge"></span></div>
       <h1 class="hero-title"><span data-t="hero_title1"></span><br><span class="hl shimmer-text" data-t="hero_title2"></span></h1>
       <p class="hero-desc" data-t="hero_desc"></p>
+      <p class="hero-slogan reveal" data-t="hero_slogan"></p>
       <div class="hero-btns">
         <button class="hbtn hbtn-primary" onclick="openApp()" data-t="hero_btn1"></button>
         <button class="hbtn hbtn-ghost" onclick="scrollToSection('video-sec')" data-t="hero_btn2"></button>
@@ -1057,13 +1060,54 @@ html { scroll-padding-top: 72px; }
     <h2 class="sec-title dfc-title" data-t="dfc_title"></h2>
     <p class="sec-desc dfc-desc" data-t="dfc_desc"></p>
     <div class="dfc-steps">
-      <div class="dfc-step ds1 reveal d1"><div class="dfc-num"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#fff"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div><div class="dfc-step-title" data-t="dfc1t"></div><div class="dfc-step-desc" data-t="dfc1d"></div><span class="dfc-step-tag" data-t="nav_project"></span></div>
-      <div class="dfc-step ds2 reveal d2"><div class="dfc-num"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#fff"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/></svg></div><div class="dfc-step-title" data-t="dfc2t"></div><div class="dfc-step-desc" data-t="dfc2d"></div><span class="dfc-step-tag" data-t="nav_features"></span></div>
-      <div class="dfc-step ds3 reveal d3"><div class="dfc-num"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#fff"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div class="dfc-step-title" data-t="dfc3t"></div><div class="dfc-step-desc" data-t="dfc3d"></div><span class="dfc-step-tag" data-t="nav_project"></span></div>
-      <div class="dfc-step ds4 reveal d4"><div class="dfc-num"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#fff"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div><div class="dfc-step-title" data-t="dfc4t"></div><div class="dfc-step-desc" data-t="dfc4d"></div><span class="dfc-step-tag" data-t="nav_future"></span></div>
+      <div class="dfc-step ds1 reveal d1"><div class="dfc-num"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#fff"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="dfc-step-title" data-t="dfc1t"></div><div class="dfc-step-desc" data-t="dfc1d"></div></div>
+      <div class="dfc-step ds2 reveal d2"><div class="dfc-num"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#fff"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/></svg></div><div class="dfc-step-title" data-t="dfc2t"></div><div class="dfc-step-desc" data-t="dfc2d"></div></div>
+      <div class="dfc-step ds3 reveal d3"><div class="dfc-num"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#fff"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/><line x1="5" y1="3" x2="19" y2="21"/></svg></div><div class="dfc-step-title" data-t="dfc3t"></div><div class="dfc-step-desc" data-t="dfc3d"></div></div>
+      <div class="dfc-step ds4 reveal d4"><div class="dfc-num"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#fff"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div><div class="dfc-step-title" data-t="dfc4t"></div><div class="dfc-step-desc" data-t="dfc4d"></div></div>
     </div>
   </div>
 </section>
+
+<!-- CANVA VIDEO -->
+<section id="video-sec" style="background:var(--white);padding:clamp(60px,8vw,100px) clamp(20px,4vw,40px);">
+  <div class="section-inner sec-center" style="max-width:960px;margin:0 auto;">
+    <div class="sec-badge blue" style="display:inline-block;margin-bottom:16px;" data-t="vid_badge"></div>
+    <h2 class="sec-title reveal" data-t="vid_title"></h2>
+    <div class="reveal" style="width:100%;margin-top:36px;border-radius:18px;overflow:hidden;box-shadow:0 16px 60px rgba(26,115,232,.12);border:1.5px solid rgba(26,115,232,.12);">
+      <div style="position:relative;width:100%;padding-top:56.25%;">
+        <iframe
+          loading="lazy"
+          style="position:absolute;inset:0;width:100%;height:100%;border:none;display:block;"
+          src="https://www.canva.com/design/DAHCdHVVGMI/rgIb1XoZaWmBztimexb8Tg/watch?embed"
+          allowfullscreen
+          allow="fullscreen"
+          title="ParKilit Presentation">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3D MODEL -->
+<section id="model3d" style="background:var(--off);padding:clamp(60px,8vw,100px) clamp(20px,4vw,40px);">
+  <div class="section-inner sec-center" style="max-width:960px;margin:0 auto;">
+    <div class="sec-badge dark" style="display:inline-block;margin-bottom:16px;">3D Model</div>
+    <h2 class="sec-title reveal">ParKilit <span style="background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">3D</span></h2>
+    <div class="reveal" style="width:100%;margin-top:36px;border-radius:18px;overflow:hidden;box-shadow:0 16px 60px rgba(26,115,232,.1);border:1.5px solid var(--border);">
+      <div style="position:relative;width:100%;padding-top:56.25%;">
+        <iframe
+          loading="lazy"
+          title="ParKilit"
+          style="position:absolute;inset:0;width:100%;height:100%;border:none;display:block;"
+          src="https://sketchfab.com/models/85bf14f156c0474e8c3acc65ca786851/embed?autostart=0&ui_controls=1&ui_infos=0&ui_inspector=0&ui_stop=1&ui_watermark=1&ui_watermark_link=1"
+          allow="autoplay; fullscreen; xr-spatial-tracking"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
 
 <!-- SKA -->
 <section id="ska">
@@ -1568,6 +1612,7 @@ const T = {
     nav_future:'Gelecek', nav_team:'Ekip', nav_enter:'Sisteme Giriş →',
     // HERO
     hero_badge:'DFC Projesi', hero_title1:'Parklar artık', hero_title2:'daha güvenli',
+    hero_slogan:'Çocuklar Neşeyle Koşsun, Parkımız Turnikeyle Korunsun!',
     hero_desc:'ParKilit, QR kod ve kimlik tabanlı akıllı giriş/çıkış sistemiyle parkları herkes için güvenli, temiz ve izlenebilir hale getiriyor.',
     hero_btn1:'Sisteme Giriş Yap', hero_btn2:'▶ Tanıtım Videosu',
     hero_s1:'SKA Maddesi', hero_s2:'İzleme', hero_s3:'Yerli Yazılım',
@@ -1750,6 +1795,7 @@ const T = {
     nav_future:'Future', nav_team:'Team', nav_enter:'Enter System →',
     // HERO
     hero_badge:'DFC Project', hero_title1:'Parks are now', hero_title2:'safer',
+    hero_slogan:'Let Children Run with Joy, Our Park Protected by Turnstile!',
     hero_desc:'ParKilit makes parks safe, clean and trackable for everyone with QR code and identity-based smart entry.',
     hero_btn1:'Enter System', hero_btn2:'Watch Demo',
     hero_s1:'SDG Goals', hero_s2:'Monitoring', hero_s3:'Local Software',
