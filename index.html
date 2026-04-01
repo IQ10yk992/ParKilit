@@ -198,7 +198,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,22,40,.92
 .hero-badge-txt{font-size:12px;font-weight:700;color:var(--blue2);letter-spacing:.08em;text-transform:uppercase;}
 .hero-title{font-family:var(--head);font-size:clamp(38px,5vw,58px);font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.03em;margin-bottom:18px;}
 .hero-title .hl{background:linear-gradient(135deg,var(--blue2),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.hero-slogan{font-size:13px;font-style:italic;color:rgba(255,255,255,.5);margin-top:10px;max-width:480px;line-height:1.6;border-left:2px solid rgba(255,255,255,.15);padding-left:12px;}
+.hero-slogan{font-size:14px;font-style:italic;font-weight:600;color:rgba(255,255,255,.75);margin-top:14px;margin-bottom:24px;max-width:520px;line-height:1.6;letter-spacing:.01em;border-left:3px solid var(--blue2);padding-left:14px;background:rgba(255,255,255,.04);padding:10px 14px;border-radius:0 8px 8px 0;}
 .hero-desc{font-size:17px;color:rgba(255,255,255,.65);line-height:1.75;margin-bottom:32px;max-width:500px;}
 .hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
 .hbtn{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:14px;font-family:var(--sans);font-size:15px;font-weight:800;text-decoration:none;border:none;cursor:pointer;transition:all .2s;}
@@ -879,6 +879,30 @@ button { transition: all .2s cubic-bezier(.4,0,.2,1); }
 
 /* Smooth scroll for anchors */
 html { scroll-padding-top: 72px; }
+
+/* ── HYBRID QR DISPLAY SCREEN ─────────────────────────────────────── */
+.uqr-screen{display:flex;flex-direction:column;align-items:center;width:100%;height:100%;background:linear-gradient(160deg,#0a1628 0%,#0f2040 60%,#0a1628 100%);overflow-y:auto;padding-bottom:24px;}
+.uqr-user-pill{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:40px;padding:8px 16px 8px 8px;margin-top:6px;width:calc(100% - 32px);max-width:360px;}
+.uqr-mode-row{display:flex;gap:8px;margin:10px 0 6px;width:calc(100% - 32px);max-width:360px;}
+.uqr-mode-row .smb{flex:1;padding:10px 6px;font-size:12px;}
+.uqr-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:20px 16px 16px;width:calc(100% - 32px);max-width:360px;display:flex;flex-direction:column;align-items:center;gap:12px;position:relative;}
+.uqr-box{background:#fff;border-radius:14px;padding:14px;position:relative;display:flex;align-items:center;justify-content:center;}
+.uqr-box canvas,.uqr-box img{display:block;border-radius:6px;}
+.uqr-expired-overlay{position:absolute;inset:0;background:rgba(255,255,255,.95);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;padding:12px;}
+.uqr-refresh-btn{margin-top:8px;background:var(--blue);color:#fff;border:none;border-radius:20px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);}
+.uqr-mode-badge{font-size:11px;font-weight:800;padding:5px 14px;border-radius:100px;letter-spacing:.04em;}
+.uqr-mode-badge.in-badge{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.25);}
+.uqr-mode-badge.out-badge{background:rgba(247,37,133,.15);color:#fb7185;border:1px solid rgba(247,37,133,.25);}
+.uqr-timer-wrap{width:100%;padding:8px 4px 0;}
+.uqr-timer-wrap.warn .uqr-timer-bar{background:var(--amber)!important;}
+.uqr-timer-wrap.warn .uqr-timer-val{color:var(--amber);}
+.uqr-timer-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.uqr-timer-lbl{font-size:11px;color:rgba(255,255,255,.4);font-weight:600;}
+.uqr-timer-val{font-size:13px;font-weight:800;color:rgba(255,255,255,.8);font-family:var(--mono);}
+.uqr-timer-track{width:100%;height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;}
+.uqr-timer-bar{height:100%;background:var(--blue2);border-radius:4px;transition:width 1s linear,background .3s;}
+.uqr-hint{font-size:11px;color:rgba(255,255,255,.35);text-align:center;line-height:1.5;padding:0 8px;}
+/* ────────────────────────────────────────────────────────────────── */
 </style>
 </head>
 <body>
@@ -1261,6 +1285,7 @@ html { scroll-padding-top: 72px; }
 
 <section id="cta">
   <div class="section-inner sec-center">
+    <div class="cta-slogan-badge">Parkilit – Güvenli Giriş, Akıllı Gelecek</div>
     <h2 class="cta-title" data-t="cta_title"></h2>
     <p class="cta-desc" data-t="cta_desc"></p>
     <button class="hbtn hbtn-primary" style="background:#fff;color:var(--blue);font-size:15px;padding:14px 28px;" onclick="openApp()" data-t="cta_btn"></button>
@@ -1407,12 +1432,13 @@ html { scroll-padding-top: 72px; }
                 <circle class="trg" cx="40" cy="40" r="35"/>
                 <circle class="trfg" id="tur-rfg" cx="40" cy="40" r="35"/>
               </svg>
-              <div class="trc"><div class="trt" id="tur-tv">05:00</div><div class="trl">KALAN</div></div>
+              <div class="trc"><div class="trt" id="tur-tv" style="font-size:11px;letter-spacing:.08em;">HAZIR</div><div class="trl" id="tur-tv-lbl">SİSTEM</div></div>
             </div>
             <div class="tur-timer-info">
               <div class="tur-timer-ttl" data-t="tur_timer_ttl"></div>
               <div class="tur-timer-sub" data-t="tur_timer_sub"></div>
-              <div class="tpbar"><div class="tpfill" id="tur-pfill" style="width:100%"></div></div>
+              <!-- Hybrid: Progress bar shows system readiness, not countdown -->
+              <div class="tpbar"><div class="tpfill" id="tur-pfill" style="width:100%;background:linear-gradient(90deg,var(--blue),var(--teal));"></div></div>
             </div>
           </div>
         </div>
@@ -1502,11 +1528,6 @@ html { scroll-padding-top: 72px; }
     </div>
     <div class="adm-card">
       <div class="adm-card-hdr"><div class="adm-card-ttl" data-t="card_users"></div><span class="badge badge-b" id="badge-users">0</span></div>
-      <div style="padding:10px 12px 0;">
-        <button onclick="adminDeleteAllUsersOnce()" style="width:100%;background:var(--red-l);color:var(--red);border:1.5px solid rgba(239,68,68,.25);border-radius:10px;padding:9px 11px;font-family:var(--sans);font-size:12px;font-weight:800;cursor:pointer;">
-          ⚠️ Tüm Kullanıcıları Sil (Tek Sefer)
-        </button>
-      </div>
       <div class="log-list" id="user-list"><div class="log-empty" data-t="no_users"></div></div>
     </div>
     <div class="adm-card">
@@ -1534,31 +1555,70 @@ html { scroll-padding-top: 72px; }
 
 <!-- ─── QR SCAN ─── -->
 <div class="scr" id="s-scan">
-  <video id="vid" autoplay playsinline muted></video>
-  <canvas id="cvs"></canvas>
-  <div class="scan-hdr">
-    <button class="scan-back-btn" onclick="goLogin()">←</button>
-    <div class="scan-hdr-txt"><div class="scan-title" id="scan-title"></div><div class="scan-sub" id="scan-sub"></div></div>
-    <img class="scan-logo" src="data:image/png;base64,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" alt="">
-  </div>
-  <div class="dm t"></div><div class="dm b"></div><div class="dm l"></div><div class="dm r"></div>
-  <div class="sframe">
-    <div class="sc tl in-c" id="sc-tl"></div><div class="sc tr in-c" id="sc-tr"></div>
-    <div class="sc bl in-c" id="sc-bl"></div><div class="sc br in-c" id="sc-br"></div>
-    <div class="laser in-l" id="laser"></div>
-  </div>
-  <div class="shint"><div class="shint-pill" id="scan-hint"></div></div>
-  <div class="sbar">
-    <div class="upill">
+  <!-- Hidden camera elements kept for legacy compatibility -->
+  <video id="vid" autoplay playsinline muted style="display:none;"></video>
+  <canvas id="cvs" style="display:none;"></canvas>
+
+  <!-- ── USER QR DISPLAY SCREEN (Hybrid System) ── -->
+  <div class="uqr-screen">
+    <!-- Header -->
+    <div class="scan-hdr">
+      <button class="scan-back-btn" onclick="goLogin()">←</button>
+      <div class="scan-hdr-txt">
+        <div class="scan-title" id="scan-title"></div>
+        <div class="scan-sub" id="scan-sub"></div>
+      </div>
+      <img class="scan-logo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%231a73e8'/%3E%3Ctext y='28' x='7' font-size='22' fill='white'%3E%F0%9F…%3C/text%3E%3C/svg%3E" alt="" style="width:34px;height:34px;opacity:.7;">
+    </div>
+
+    <!-- User info pill -->
+    <div class="uqr-user-pill">
       <div class="uav in-av" id="u-av">?</div>
-      <div><div class="uname" id="u-name">—</div><div class="utc-lbl" id="u-tc">—</div></div>
+      <div>
+        <div class="uname" id="u-name">—</div>
+        <div class="utc-lbl" id="u-tc">—</div>
+      </div>
       <div class="udot in-d" id="u-dot"></div>
     </div>
-    <div class="sst on" id="sst"><div class="dots"><span></span><span></span><span></span></div> <span id="sst-txt"></span></div>
-    <div class="scan-mode-btns">
+
+    <!-- Mode buttons -->
+    <div class="uqr-mode-row">
       <button class="smb in-btn active-smb" id="btn-entry" onclick="switchMode('entry')" data-t="scan_btn_entry"></button>
       <button class="smb out-btn" id="btn-exit" onclick="switchMode('exit')" data-t="scan_btn_exit"></button>
     </div>
+
+    <!-- QR Card -->
+    <div class="uqr-card">
+      <!-- QR Code display -->
+      <div class="uqr-box">
+        <div id="user-qr-display"></div>
+        <!-- Expired overlay -->
+        <div id="uqr-expired-msg" class="uqr-expired-overlay" style="display:none;">
+          <div style="font-size:28px;">⏰</div>
+          <div style="font-size:13px;font-weight:700;margin-top:6px;" data-t="qr_expired"></div>
+          <button onclick="refreshUserQR()" class="uqr-refresh-btn" data-t="qr_refresh"></button>
+        </div>
+      </div>
+
+      <!-- Mode badge -->
+      <div class="uqr-mode-badge in-badge" id="uqr-mode-badge"></div>
+
+      <!-- Timer -->
+      <div class="uqr-timer-wrap" id="uqr-timer-wrap">
+        <div class="uqr-timer-row">
+          <span class="uqr-timer-lbl" data-t="qr_expires_in"></span>
+          <span class="uqr-timer-val" id="uqr-timer-val">05:00</span>
+        </div>
+        <div class="uqr-timer-track">
+          <div class="uqr-timer-bar" id="uqr-timer-bar" style="width:100%;"></div>
+        </div>
+      </div>
+
+      <!-- Hint -->
+      <div class="uqr-hint" id="scan-hint" data-t="scan_entry_hint"></div>
+    </div>
+
+    <!-- Manual code fallback -->
     <button class="manuel-toggle" onclick="toggleManuel()" data-t="manuel_toggle"></button>
     <div class="manuel-wrap" id="manuel-wrap">
       <div class="manuel-inner">
@@ -1571,7 +1631,6 @@ html { scroll-padding-top: 72px; }
     </div>
   </div>
 </div>
-
 <!-- ─── BAŞARI ─── -->
 <div class="scr entry-bg" id="s-ok">
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;">
@@ -1613,11 +1672,11 @@ html { scroll-padding-top: 72px; }
 const T = {
   tr: {
     // NAV
-    nav_project:'Proje', nav_features:'Özellikler', nav_dfc:'DFC', nav_video:'Video',
+    nav_project:'Proje', nav_features:'Özellikler', nav_dfc:'FIDS', nav_video:'Video',
     nav_future:'Gelecek', nav_team:'Ekip', nav_enter:'Sisteme Giriş →',
     // HERO
     hero_badge:'DFC Projesi', hero_title1:'Parklar artık', hero_title2:'daha güvenli',
-    hero_slogan:'Çocuklar Neşeyle Koşsun, Parkımız Turnikeyle Korunsun!',
+    hero_slogan:'Parkilit – Güvenli Giriş, Akıllı Gelecek',
     hero_desc:'ParKilit, QR kod ve kimlik tabanlı akıllı giriş/çıkış sistemiyle parkları herkes için güvenli, temiz ve izlenebilir hale getiriyor.',
     hero_btn1:'Sisteme Giriş Yap', hero_btn2:'▶ Tanıtım Videosu',
     hero_s1:'SKA Maddesi', hero_s2:'İzleme', hero_s3:'Yerli Yazılım',
@@ -1651,7 +1710,7 @@ const T = {
     f8d:'Admin turnike ekranındaki kamera, üye kartlarındaki QR barkodları da okuyabilir. Telefonsuz kullanıcılar kartlarını turnikeye göstererek giriş yapar.',
     f9t:'Çok Cihaz Senkronizasyonu',
     f9d:'Firebase altyapısı ile admin paneli, turnike ekranı ve kullanıcı telefonu birbirleriyle anlık senkronize çalışır. Farklı cihazlardaki veriler tutarlı kalır.',
-    dfc_badge:'Design For Change', dfc_title:'DFC Adımlarımız',
+    dfc_badge:'FIDS', dfc_title:'Hisset, Hayal Et, Yap, Paylaş',
     dfc_desc:'Design For Change metodolojisiyle geliştirilen ParKilit, 4 temel adımı hayata geçiriyor.',
     dfc1t:'Hisset', dfc1d:'Ebeveynlerin çocuklarını parka yalnız gönderemediğini, sürekli kaygı yaşadığını gözlemledik. "Bir şey olursa?" korkusu aileleri kısıtlıyor. Çocuklar özgürce oynayamıyor.',
     dfc2t:'Hayal Et', dfc2d:'QR + kimlik tabanlı, düşük maliyetli, belediyeyle entegre bir akıllı giriş sistemi hayal ettik.',
@@ -1686,7 +1745,7 @@ const T = {
     imp_meaning_quote:'"<strong>Impact</strong> (etki) ve <strong>actio</strong> (eylem) köklerinden türeyen Impectia; sadece düşünen değil, harekete geçen ve gerçek etki yaratan bir nesli temsil eder. Gençlerin teknolojiyle dünyayı değiştirebileceğine sadece inanmıyoruz — bunu kanıtlamak için çalışıyoruz."',
     imp_meaning_sub:'— Impectia · ODTÜ GVO Ankara Lisesi',
     imp_v1:'Merak', imp_v2:'Sorumluluk', imp_v3:'Sürdürülebilirlik', imp_v4:'Etki', imp_v5:'İşbirliği',
-    cta_title:'Sistemi Şimdi Deneyin', cta_desc:'Admin paneli, turnike ekranı ve kullanıcı uygulaması tek yerden.',
+    cta_title:'Parkilit – Güvenli Giriş, Akıllı Gelecek', cta_desc:'Admin paneli, turnike ekranı ve kullanıcı uygulaması tek yerden. QR tabanlı akıllı giriş sistemi.',
     cta_btn:'Sisteme Giriş Yap',
     foot_copy:'© 2025 ParKilit · DFC Projesi',
     // APP
@@ -1796,11 +1855,13 @@ const T = {
   },
   en: {
     // NAV
-    nav_project:'Project', nav_features:'Features', nav_dfc:'DFC', nav_video:'Video',
+    nav_project:'Project', nav_features:'Features', nav_dfc:'FIDS', nav_video:'Video',
     nav_future:'Future', nav_team:'Team', nav_enter:'Enter System →',
     // HERO
     hero_badge:'DFC Project', hero_title1:'Parks are now', hero_title2:'safer',
-    hero_slogan:'Let Children Run with Joy, Our Park Protected by Turnstile!',
+    hero_slogan:'Parkilit – Secure Entry, Smart Future',
+    qr_expires_in:'Valid for:', qr_expired:'QR Expired', qr_refresh:'Refresh',
+    scan_qr_hint:'Show this QR code to the turnstile camera',
     hero_desc:'ParKilit makes parks safe, clean and trackable for everyone with QR code and identity-based smart entry.',
     hero_btn1:'Enter System', hero_btn2:'Watch Demo',
     hero_s1:'SDG Goals', hero_s2:'Monitoring', hero_s3:'Local Software',
@@ -1834,7 +1895,7 @@ const T = {
     f8d:'The camera on the admin turnstile screen can also read QR barcodes on member cards. Phone-less users can enter by showing their card at the turnstile.',
     f9t:'Multi-Device Sync',
     f9d:'With Firebase infrastructure, the admin panel, turnstile screen and user phones sync in real time. Data remains consistent across all devices.',
-    dfc_badge:'Design For Change', dfc_title:'Our DFC Steps',
+    dfc_badge:'FIDS', dfc_title:'Feel, Imagine, Do, Share',
     dfc_desc:'ParKilit, developed with the Design For Change methodology, brings 4 fundamental steps to life.',
     dfc1t:'Feel', dfc1d:'We observed that parents cannot send their children to the park alone and constantly feel anxious. The fear of "what if something happens?" restricts families. Children cannot play freely.',
     dfc2t:'Imagine', dfc2d:'We imagined a QR + identity-based, low-cost, municipality-integrated smart entry system.',
@@ -1869,7 +1930,7 @@ const T = {
     imp_meaning_quote:'"Rooted in <strong>Impact</strong> and <strong>actio</strong> (action), Impectia represents a generation that doesn\'t just think — it takes action and creates real change. We don\'t just believe that young people can change the world with technology — we work to prove it."',
     imp_meaning_sub:'— Impectia · ODTÜ GVO Ankara High School',
     imp_v1:'Curiosity', imp_v2:'Responsibility', imp_v3:'Sustainability', imp_v4:'Impact', imp_v5:'Collaboration',
-    cta_title:'Try the System Now', cta_desc:'Admin panel, turnstile screen and user app all in one place.',
+    cta_title:'Parkilit – Secure Entry, Smart Future', cta_desc:'Admin panel, turnstile screen and user app all in one place. QR-based smart entry system.',
     cta_btn:'Enter System',
     foot_copy:'© 2025 ParKilit · DFC Project',
     // APP
@@ -2104,8 +2165,8 @@ function goLogin() {
 function goScan() {
   resetOkAnim();
   navigate('/app/scan');
-  if (!qrStream) startQRCam();
-  else { scanning = true; clearInterval(scanInt); lastQRData = ''; scanInt = setInterval(frame, 250); }
+  // ← Hybrid sistem: kullanıcı QR'ını oluştur (kamera yerine)
+  generateUserQR();
 }
 
 function scrollToSection(id) {
@@ -2175,25 +2236,30 @@ function initFirebase() {
 function setupFirebaseListeners() {
   if (!fdb) return;
 
-  // Yeni yapı: logs/{logId}
-  fdb.ref('logs').on('value', snap => {
+  // Kullanıcılar değişince yerel cache'i güncelle
+  fdb.ref('pk/users').on('value', snap => {
     const data = snap.val();
     if (data) {
-      const entries = Object.values(data).filter(Boolean).map(l => ({
-        ...l,
-        mode: l.mode || l.type || 'entry',
-        type: l.type || l.mode || 'entry'
-      }));
+      const users = Object.values(data);
+      localStorage.setItem('pk_users', JSON.stringify(users));
+    }
+  });
+
+  // Giriş/çıkış kayıtları değişince admin'i güncelle
+  fdb.ref('pk/entries').on('value', snap => {
+    const data = snap.val();
+    if (data) {
+      const entries = [];
+      Object.values(data).forEach(tcGroup => {
+        if (typeof tcGroup === 'object') {
+          Object.values(tcGroup).forEach(e => { if(e) entries.push(e); });
+        }
+      });
       entries.sort((a,b) => (a.timestamp||0) - (b.timestamp||0));
       localStorage.setItem('pk_entries', JSON.stringify(entries));
       refreshAdminUI();
       updateRprPreview();
     }
-  });
-  // Hybrid QR sessions
-  fdb.ref('qrSessions').on('value', snap => {
-    const data = snap.val() || {};
-    saveQrSessionsMap(data);
   });
 
   // QR değişince yerel cache'i güncelle
@@ -2223,34 +2289,20 @@ function setupFirebaseListeners() {
     }
   });
 
-  // Yeni yapı: users/{tc}/inside
-  fdb.ref('users').on('value', snap => {
+  // Park durumları değişince yerel cache'i güncelle
+  // ── QR OTURUMLARI (Hybrid sistem için) ──
+  // qrSessions Firebase dinleyicisi — real-time QR geçersizleştirme için
+  // Not: Tek yönlü dinleme, aktif QR listesi admin panelinde gösterilebilir
+  // fdb.ref('qrSessions') dinleyicisi ihtiyaca göre eklenebilir
+
+  fdb.ref('pk/status').on('value', snap => {
     const data = snap.val();
-    if (!data) return;
-    const users = [];
-    Object.entries(data).forEach(([tc, val]) => {
-      if (!val || typeof val !== 'object') return;
-      if (typeof val.inside === 'boolean') {
-        localStorage.setItem('pk_status_'+tc, val.inside ? 'inside' : 'outside');
-      }
-      if (val.tc && val.ad && val.soyad && val.pw) {
-        users.push({
-          id: val.id || Date.now().toString(),
-          tc: val.tc,
-          ad: val.ad,
-          soyad: val.soyad,
-          pw: val.pw,
-          admCreated: !!val.admCreated,
-          staticQrId: val.staticQrId || undefined
-        });
-      }
-      if (typeof val.staticQrId === 'string' && val.staticQrId.length) {
-        const i = users.findIndex(u => u.tc === tc);
-        if (i !== -1) users[i].staticQrId = val.staticQrId;
-      }
-    });
-    if (users.length) localStorage.setItem('pk_users', JSON.stringify(users));
-    refreshAdminUI();
+    if (data) {
+      Object.entries(data).forEach(([tc, s]) => {
+        localStorage.setItem('pk_status_'+tc, s);
+      });
+      refreshAdminUI();
+    }
   });
 }
 
@@ -2274,14 +2326,8 @@ const DB = {
     localStorage.setItem('pk_users', JSON.stringify(users));
     if (fdb) {
       const obj = {};
-      users.forEach(u => {
-        obj[u.tc] = {
-          ...u,
-          inside: DB.getStatus(u.tc) === 'inside',
-          staticQrId: u.staticQrId || null
-        };
-      });
-      fdb.ref('users').set(obj).catch(e => console.warn('saveUsers Firebase hata:', e.message));
+      users.forEach(u => { obj[u.tc] = u; });
+      fdb.ref('pk/users').set(obj).catch(e => console.warn('saveUsers Firebase hata:', e.message));
     }
   },
 
@@ -2295,37 +2341,21 @@ const DB = {
     try { return JSON.parse(localStorage.getItem('pk_entries')||'[]'); } catch { return []; }
   },
   addEntry: (entry) => {
-    if (!entry || !entry.photo) {
-      console.warn('addEntry engellendi: photo zorunlu');
-      return false;
-    }
     // Önce localStorage'a yaz (anlık göster)
-    const normalized = { ...entry, mode: entry.mode || entry.type, type: entry.type || entry.mode };
-    const l = DB.getEntries(); l.push(normalized);
+    const l = DB.getEntries(); l.push(entry);
     localStorage.setItem('pk_entries', JSON.stringify(l));
     // Firebase'e yaz
     if (fdb) {
       // Fotoğraf varsa sıkıştır (Firebase 10MB limit)
-      const e = { ...normalized };
+      const e = { ...entry };
       if (e.photo && e.photo.length > 100000) {
         e.photo = compressPhoto(e.photo, 320, 240, 0.45);
       }
-      const logPayload = {
-        tc: e.tc,
-        timestamp: e.timestamp || Date.now(),
-        type: e.type || e.mode || 'entry',
-        photo: e.photo,
-        name: e.name || '',
-        mode: e.mode || e.type || 'entry',
-        time: e.time || new Date().toLocaleTimeString(lang==='en'?'en-GB':'tr-TR'),
-        source: e.source || 'qr'
-      };
-      fdb.ref('logs').push(logPayload).catch(err => console.warn('logs Firebase hata:', err.message));
+      fdb.ref('pk/entries/' + e.tc).push(e).catch(err => console.warn('addEntry Firebase hata:', err.message));
     }
     // Aynı cihaz diğer sekmelere bildir
     if (bc) bc.postMessage({ type: 'entry_added' });
     refreshAdminUI(); updateRprPreview();
-    return true;
   },
 
   // ── QR ANAHTAR ──
@@ -2373,8 +2403,58 @@ const DB = {
   getStatus: (tc) => localStorage.getItem('pk_status_'+tc)||'outside',
   setStatus: (tc, s) => {
     localStorage.setItem('pk_status_'+tc, s);
-    if (fdb) fdb.ref('users/'+tc+'/inside').set(s === 'inside').catch(e => console.warn('users inside set hata:', e.message));
+    if (fdb) fdb.ref('pk/status/'+tc).set(s).catch(e => console.warn('setStatus hata:', e.message));
     if (bc) bc.postMessage({ type: 'status', tc, status: s });
+  },
+
+  // ── HYBRİD QR OTURUMU ──
+  // Dynamic QR: kullanıcı telefonunda oluşturur, tek kullanımlık + süreli
+  // Static QR (card): admin oluşturur, DB'de kalıcı saklanır
+  // qrSessions/{qrId} = { type:'dynamic'|'static', tc, name, ts, expiresAt, used, source:'phone'|'card' }
+  setQRSession: (qrId, session) => {
+    const key = 'pk_qrs_' + qrId;
+    localStorage.setItem(key, JSON.stringify(session));
+    if (fdb) {
+      fdb.ref('qrSessions/' + qrId).set(session)
+        .catch(e => console.warn('setQRSession Firebase hata:', e.message));
+    }
+  },
+  getQRSession: (qrId, callback) => {
+    // Önce localStorage'dan dene (hızlı)
+    try {
+      const local = JSON.parse(localStorage.getItem('pk_qrs_' + qrId) || 'null');
+      if (local) { callback(local); return; }
+    } catch(e) {}
+    // Firebase'den al
+    if (fdb) {
+      fdb.ref('qrSessions/' + qrId).once('value', snap => {
+        callback(snap.val());
+      }).catch(() => callback(null));
+    } else {
+      callback(null);
+    }
+  },
+  invalidateQRSession: (qrId) => {
+    // Dynamic QR'ı tek kullanımlık yap — kullanıldı olarak işaretle
+    if (fdb) {
+      fdb.ref('qrSessions/' + qrId + '/used').set(true)
+        .catch(e => console.warn('invalidateQRSession hata:', e.message));
+    }
+    try {
+      const key = 'pk_qrs_' + qrId;
+      const s = JSON.parse(localStorage.getItem(key) || 'null');
+      if (s) { s.used = true; localStorage.setItem(key, JSON.stringify(s)); }
+    } catch(e) {}
+  },
+  // Admin card QR için kalıcı kayıt (static)
+  setCardQR: (tc, name, qrId) => {
+    const cardData = { type: 'static', tc, name, source: 'card', used: false, ts: Date.now(), expiresAt: 0 };
+    // Static card QR'ın süresi dolmaz (expiresAt:0 = sonsuz)
+    if (fdb) {
+      fdb.ref('qrSessions/' + qrId).set(cardData)
+        .catch(e => console.warn('setCardQR Firebase hata:', e.message));
+    }
+    localStorage.setItem('pk_qrs_' + qrId, JSON.stringify(cardData));
   },
 };
 
@@ -2416,7 +2496,6 @@ let CU = null, qrStream = null, scanInt = null, scanning = false, kvkk = true;
 let scanMode = 'entry', waitPoll = null, lastQRData = '', lastQRTime = 0;
 let turCamStream = null, turCamOpen = false, turTimeLeft = 300, turCurrentKey = '';
 let turStarted = false, lastPendingId = null;
-let userQrRefreshInt = null;
 const DURATION = 300, CIRC = 2 * Math.PI * 35;
 
 // ═══════════════════════════════════════
@@ -2470,200 +2549,11 @@ function tcValid(tc) {
   if (d.slice(0,10).reduce((a,b)=>a+b,0) % 10 !== d[10]) return false;
   return true;
 }
-const SECURITY_CONFIG = {
-  roles: {
-    admin: {
-      username: 'admin',
-      passwordHash: 'ba4344b5d824443e1472bb517c34672c46b5ffbf73337c15bbedf0c2240d81b7'
-    },
-    qradmin: {
-      username: 'qradmin',
-      passwordHash: 'ba4344b5d824443e1472bb517c34672c46b5ffbf73337c15bbedf0c2240d81b7'
-    }
-  }
-};
-async function sha256Hex(input) {
-  if (window.crypto && crypto.subtle && window.TextEncoder) {
-    const enc = new TextEncoder().encode(input);
-    const buf = await crypto.subtle.digest('SHA-256', enc);
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-  // Fallback for restricted/insecure contexts.
-  return sha256Fallback(input);
-}
-async function hashPw(pw) { return sha256Hex(pw); }
-function legacyHashPw(pw) {
-  return btoa(unescape(encodeURIComponent(pw + '_pk')));
-}
-function sha256Fallback(ascii) {
-  function rightRotate(value, amount) { return (value>>>amount) | (value<<(32-amount)); }
-  const mathPow = Math.pow; const maxWord = mathPow(2, 32);
-  let result = '';
-  const words = [];
-  const asciiBitLength = ascii.length * 8;
-  const hash = sha256Fallback.h = sha256Fallback.h || [];
-  const k = sha256Fallback.k = sha256Fallback.k || [];
-  let primeCounter = k.length;
-  const isComposite = {};
-  for (let candidate = 2; primeCounter < 64; candidate++) {
-    if (!isComposite[candidate]) {
-      for (let i = 0; i < 313; i += candidate) isComposite[i] = candidate;
-      hash[primeCounter] = (mathPow(candidate, .5) * maxWord)|0;
-      k[primeCounter++] = (mathPow(candidate, 1/3) * maxWord)|0;
-    }
-  }
-  ascii += '\x80';
-  while (ascii.length % 64 - 56) ascii += '\x00';
-  for (let i = 0; i < ascii.length; i++) {
-    const j = ascii.charCodeAt(i);
-    words[i>>2] |= j << ((3 - i)%4)*8;
-  }
-  words[words.length] = ((asciiBitLength / maxWord)|0);
-  words[words.length] = (asciiBitLength);
-  for (let j = 0; j < words.length;) {
-    const w = words.slice(j, j += 16);
-    const oldHash = hash.slice(0);
-    for (let i = 0; i < 64; i++) {
-      const w15 = w[i - 15], w2 = w[i - 2];
-      const a = hash[0], e = hash[4];
-      const temp1 = hash[7]
-        + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
-        + ((e & hash[5]) ^ ((~e) & hash[6]))
-        + k[i]
-        + (w[i] = (i < 16) ? w[i] : (
-          w[i - 16]
-          + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15>>>3))
-          + w[i - 7]
-          + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2>>>10))
-        )|0);
-      const temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
-        + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
-      hash.unshift((temp1 + temp2)|0);
-      hash[4] = (hash[4] + temp1)|0;
-      hash.pop();
-    }
-    for (let i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i])|0;
-  }
-  for (let i = 0; i < 8; i++) {
-    for (let j = 3; j + 1; j--) {
-      const b = (hash[i]>>(j*8)) & 255;
-      result += ((b < 16) ? 0 : '') + b.toString(16);
-    }
-  }
-  return result;
-}
+function hashPw(pw) { return btoa(unescape(encodeURIComponent(pw + '_pk'))); }
 function fmtTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
 function genKey() {
   const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   return Array.from({length:20}, () => c[Math.floor(Math.random()*c.length)]).join('');
-}
-// Hybrid QR core:
-// - dynamic_user: single-use + time-limited (phone)
-// - admin_card: static card QR validated against DB
-let dynamicQrSession = null;
-function createQrId() {
-  return 'qr_' + Date.now().toString(36) + '_' + genKey();
-}
-function getQrSessionsMap() {
-  try { return JSON.parse(localStorage.getItem('pk_qr_sessions') || '{}'); } catch { return {}; }
-}
-function saveQrSessionsMap(map) {
-  localStorage.setItem('pk_qr_sessions', JSON.stringify(map || {}));
-}
-function getQrSession(qrId) {
-  if (!qrId) return null;
-  const map = getQrSessionsMap();
-  return map[qrId] || null;
-}
-function setQrSession(session) {
-  if (!session || !session.qrId) return;
-  const map = getQrSessionsMap();
-  map[session.qrId] = session;
-  saveQrSessionsMap(map);
-  if (fdb) fdb.ref('qrSessions/' + session.qrId).set(session).catch(e => console.warn('qrSession set hata:', e.message));
-}
-function markQrSessionUsed(qrId) {
-  const s = getQrSession(qrId);
-  if (!s) return;
-  s.used = true;
-  s.usedAt = Date.now();
-  setQrSession(s);
-}
-function ensureDynamicUserQrSession(user) {
-  const now = Date.now();
-  if (dynamicQrSession && dynamicQrSession.tc === user.tc && !dynamicQrSession.used && (dynamicQrSession.expiresAt || 0) > now) {
-    return dynamicQrSession;
-  }
-  const qrId = createQrId();
-  const session = {
-    qrId,
-    tc: user.tc,
-    qrType: 'dynamic_user',
-    isStatic: false,
-    used: false,
-    createdAt: now,
-    expiresAt: now + 60000
-  };
-  dynamicQrSession = session;
-  setQrSession(session);
-  return session;
-}
-function ensureStaticCardQrSession(tc) {
-  const users = DB.getUsers();
-  const i = users.findIndex(u => u.tc === tc);
-  if (i === -1) return null;
-  const u = users[i];
-  if (u.staticQrId) {
-    const existing = getQrSession(u.staticQrId);
-    if (existing && existing.qrType === 'admin_card') return existing;
-  }
-  const qrId = createQrId();
-  const session = {
-    qrId,
-    tc,
-    qrType: 'admin_card',
-    isStatic: true,
-    used: false,
-    createdAt: Date.now(),
-    active: true
-  };
-  users[i].staticQrId = qrId;
-  DB.saveUsers(users);
-  if (fdb) fdb.ref('users/' + tc + '/staticQrId').set(qrId).catch(()=>{});
-  setQrSession(session);
-  return session;
-}
-function buildUserQrPayload(user) {
-  const session = ensureDynamicUserQrSession(user);
-  return session ? session.qrId : '';
-}
-function ensureUserQrBox() {
-  let box = document.getElementById('user-qr-box');
-  if (box) return box;
-  const scanBox = document.querySelector('#s-scan .scan-box');
-  if (!scanBox) return null;
-  box = document.createElement('div');
-  box.id = 'user-qr-box';
-  box.style.cssText = 'margin-top:12px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.14);border-radius:16px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px;';
-  box.innerHTML = '<div id="user-qr-canvas" style="background:#fff;border-radius:12px;padding:10px;min-height:170px;display:flex;align-items:center;justify-content:center;"></div><div id="user-qr-note" style="font-size:11px;color:rgba(255,255,255,.7);font-weight:700;text-align:center;">Kisisel QR kodunuzu turnikeye okutun</div>';
-  scanBox.appendChild(box);
-  return box;
-}
-function renderUserQR() {
-  if (!CU) return;
-  const box = ensureUserQrBox();
-  if (!box) return;
-  const qrWrap = document.getElementById('user-qr-canvas');
-  if (!qrWrap) return;
-  qrWrap.innerHTML = '';
-  new QRCode(qrWrap, {
-    text: buildUserQrPayload(CU),
-    width: 160,
-    height: 160,
-    colorDark: '#0f172a',
-    colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.H
-  });
 }
 
 // ═══════════════════════════════════════
@@ -2709,20 +2599,11 @@ function setRole(role) {
     document.getElementById('adm-pw').value = '';
   }
 }
-function showStaffLogin() {
-  const staffTabs = document.getElementById('staff-tabs');
-  const staffLink = document.getElementById('staff-link');
-  if (staffTabs) staffTabs.style.display = 'block';
-  if (staffLink) staffLink.style.display = 'none';
-  setRole('admin');
-}
 
-async function doAdminLogin() {
+function doAdminLogin() {
   const user = document.getElementById('adm-user').value.trim();
   const pw = document.getElementById('adm-pw').value;
-  const ph = await sha256Hex(pw);
-  const conf = SECURITY_CONFIG.roles.admin;
-  if (user !== conf.username || ph !== conf.passwordHash) {
+  if (user !== 'parkilit_admin' || pw !== 'ParK!l1t@2025') {
     showErr('adm-err', t('err_admin')); return;
   }
   load(true);
@@ -2734,12 +2615,10 @@ async function doAdminLogin() {
   }, 500);
 }
 
-async function doTurnikeLogin() {
+function doTurnikeLogin() {
   const user = document.getElementById('adm-user').value.trim();
   const pw = document.getElementById('adm-pw').value;
-  const ph = await sha256Hex(pw);
-  const conf = SECURITY_CONFIG.roles.qradmin;
-  if (user !== conf.username || ph !== conf.passwordHash) {
+  if (user !== 'parkilit_admin' || pw !== 'TuRn!Ke#99') {
     showErr('adm-err', t('err_admin')); return;
   }
   load(true);
@@ -2751,7 +2630,7 @@ async function doTurnikeLogin() {
   }, 500);
 }
 
-async function doReg() {
+function doReg() {
   const ad = document.getElementById('r-ad').value.trim();
   const soyad = document.getElementById('r-soyad').value.trim();
   const tc = document.getElementById('r-tc').value.trim();
@@ -2765,71 +2644,54 @@ async function doReg() {
   const users = DB.getUsers();
   if (users.find(u => u.tc === tc)) return showErr('reg-err', t('err_exists'));
   load(true);
-  const pwHash = await hashPw(pw);
   setTimeout(() => {
-    const user = { id: Date.now().toString(), ad, soyad, tc, pw: pwHash };
+    const user = { id: Date.now().toString(), ad, soyad, tc, pw: hashPw(pw) };
     users.push(user); DB.saveUsers(users); DB.saveSession(user); CU = user;
     DB.setStatus(tc, 'outside'); scanMode = 'entry';
     load(false);
     toast('🎉', ad + ' ' + soyad + ' ' + t('toast_welcome'));
-    setupScanUI(); navigate('/app/scan'); startQRCam();
+    setupScanUI(); navigate('/app/scan'); generateUserQR(); // ← Hybrid: kullanıcı QR üretir
   }, 600);
 }
 
-async function doLogin() {
+function doLogin() {
   const tc = document.getElementById('l-tc').value.trim();
   const pw = document.getElementById('l-pw').value;
   if (!tcValid(tc)) return showErr('login-err', t('err_tc_only'));
   if (!pw) return showErr('login-err', t('err_pw_only'));
   load(true);
 
-  const pwHash = await hashPw(pw);
-  const oldHash = legacyHashPw(pw);
   function tryLogin() {
-    const users = DB.getUsers();
-    let user = users.find(u => u.tc === tc && (u.pw === pwHash || u.pw === oldHash));
+    const user = DB.getUsers().find(u => u.tc === tc && u.pw === hashPw(pw));
     load(false);
     if (!user) return showErr('login-err', t('err_creds'));
-    // Legacy hash migration to SHA-256
-    if (user.pw === oldHash) {
-      user.pw = pwHash;
-      DB.saveUsers(users);
-    }
     CU = user; DB.saveSession(user);
     // Firebase'den anlık durumu al
     if (fdb) {
-      fdb.ref('users/'+tc+'/inside').once('value', snap => {
-        const st = snap.val() ? 'inside' : 'outside';
+      fdb.ref('pk/status/'+tc).once('value', snap => {
+        const st = snap.val() || 'outside';
         localStorage.setItem('pk_status_'+tc, st);
         scanMode = st === 'inside' ? 'exit' : 'entry';
-        setupScanUI(); navigate('/app/scan'); startQRCam();
+        setupScanUI(); navigate('/app/scan'); generateUserQR(); // ← Hybrid: kullanıcı QR üretir
       }).catch(() => {
         const st = DB.getStatus(tc);
         scanMode = st === 'inside' ? 'exit' : 'entry';
-        setupScanUI(); navigate('/app/scan'); startQRCam();
+        setupScanUI(); navigate('/app/scan'); generateUserQR(); // ← Hybrid: kullanıcı QR üretir
       });
     } else {
       const st = DB.getStatus(tc);
       scanMode = st === 'inside' ? 'exit' : 'entry';
-      setupScanUI(); navigate('/app/scan'); startQRCam();
+      setupScanUI(); navigate('/app/scan'); generateUserQR(); // ← Hybrid: kullanıcı QR üretir
     }
     toast('👋', t('toast_welcome'));
   }
 
   // Firebase varsa önce sync et
   if (fdb) {
-    fdb.ref('users').once('value', snap => {
+    fdb.ref('pk/users').once('value', snap => {
       const data = snap.val();
       if (data) {
-        const users = Object.values(data).filter(Boolean).map(v => ({
-          id: v.id || Date.now().toString(),
-          tc: v.tc,
-          ad: v.ad,
-          soyad: v.soyad,
-          pw: v.pw,
-          admCreated: !!v.admCreated,
-          staticQrId: v.staticQrId || undefined
-        }));
+        const users = Object.values(data);
         localStorage.setItem('pk_users', JSON.stringify(users));
       }
       tryLogin();
@@ -2848,6 +2710,8 @@ function doForgot() {
 }
 
 function doLogout() {
+  // Kullanıcı QR zamanlayıcısını temizle
+  clearInterval(userQRTimerInterval);
   stopQRCam(); clearInterval(waitPoll);
   DB.clearPending(); DB.clearResult();
   CU = null; DB.clearSession();
@@ -2935,24 +2799,25 @@ window.autoFillName = () => {
   const u = DB.getUsers().find(u => u.tc === tc);
   if (u) { document.getElementById('gen-ad').value = u.ad; document.getElementById('gen-soyad').value = u.soyad; }
 };
-window.generateCard = async () => {
+window.generateCard = () => {
   const tc = document.getElementById('gen-tc').value.trim();
   const ad = document.getElementById('gen-ad').value.trim();
   const soyad = document.getElementById('gen-soyad').value.trim();
   if (!tcValid(tc)) { showErr('gen-err', t('err_tc')); return; }
   if (!ad || !soyad) { showErr('gen-err', t('err_name')); return; }
-  const staticSession = ensureStaticCardQrSession(tc);
-  if (!staticSession) { showErr('gen-err', 'Kart QR olusturulamadi'); return; }
   document.getElementById('card-qr').innerHTML = '';
-  new QRCode(document.getElementById('card-qr'), { text: staticSession.qrId, width:68, height:68, colorDark:'#1e293b', colorLight:'#fff', correctLevel:QRCode.CorrectLevel.H });
+  const cardQrText = 'PARKILIT_CARD|'+tc+'|'+ad+' '+soyad;
+  new QRCode(document.getElementById('card-qr'), { text:cardQrText, width:68, height:68, colorDark:'#1e293b', colorLight:'#fff', correctLevel:QRCode.CorrectLevel.H });
+  // ← Hybrid: Kart QR'ını Firebase'e kaydet (backend doğrulama için)
+  // cardId = tc (statik kart — TC benzersiz identifier olarak kullanılır)
+  DB.setCardQR(tc, ad+' '+soyad, 'CARD_' + tc);
   document.getElementById('cp-name').textContent = ad + ' ' + soyad;
   document.getElementById('cp-tc').textContent = tc.substring(0,3) + ' *** ' + tc.slice(-4);
   document.getElementById('cp-date').textContent = new Date().toLocaleDateString(lang==='en'?'en-GB':'tr-TR');
   document.getElementById('gen-preview').classList.add('visible');
   const users = DB.getUsers();
   if (!users.find(u => u.tc === tc)) {
-    const defaultHash = await hashPw('park123');
-    users.push({ id: Date.now().toString(), ad, soyad, tc, pw: defaultHash, admCreated: true });
+    users.push({ id: Date.now().toString(), ad, soyad, tc, pw: hashPw('park123'), admCreated: true });
     DB.saveUsers(users); DB.setStatus(tc, 'outside');
     toast('✅', ad + ' ' + soyad + ' ' + t('gen_added'), 5000);
     refreshAdminUI();
@@ -3009,47 +2874,17 @@ window.adminDeleteUser = (tc, name) => {
   DB.saveUsers(users);
   DB.setStatus(tc, 'outside');
   if (fdb) {
-    fdb.ref('users/' + tc).remove().catch(()=>{});
+    fdb.ref('pk/users/' + tc).remove().catch(()=>{});
+    fdb.ref('pk/status/' + tc).remove().catch(()=>{});
   }
   refreshAdminUI();
   toast('🗑️', name + ' sistemden silindi.', 3000);
 };
 
-window.adminDeleteAllUsersOnce = () => {
-  const alreadyDone = localStorage.getItem('pk_admin_delete_all_users_done') === '1';
-  if (alreadyDone) {
-    toast('ℹ️', 'Bu tek seferlik işlem zaten kullanıldı.', 3500);
-    return;
-  }
-  if (!confirm('TÜM kullanıcıları sistemden silmek istediğine emin misin?\n\nBu işlem tek seferliktir ve geri alınamaz.')) return;
-  const code = prompt('Onay için SIL yazın:');
-  if (code !== 'SIL') {
-    toast('⚠️', 'İşlem iptal edildi.', 2500);
-    return;
-  }
-
-  // Local users and inside/outside cache cleanup
-  localStorage.setItem('pk_users', '[]');
-  Object.keys(localStorage).forEach(k => {
-    if (k.startsWith('pk_status_')) localStorage.removeItem(k);
-  });
-
-  // Firebase cleanup for users and QR mappings
-  if (fdb) {
-    fdb.ref('users').remove().catch(()=>{});
-    fdb.ref('qrSessions').remove().catch(()=>{});
-  }
-
-  // Lock this action as one-time
-  localStorage.setItem('pk_admin_delete_all_users_done', '1');
-  refreshAdminUI();
-  toast('🗑️', 'Tüm kullanıcılar silindi. (Tek seferlik işlem tamamlandı)', 4500);
-};
-
 window.adminClearAllEntries = () => {
   if (!confirm('Tüm giriş/çıkış kayıtlarını silmek istediğine emin misin?\n\nBu işlem geri alınamaz!')) return;
   localStorage.setItem('pk_entries', '[]');
-  if (fdb) fdb.ref('logs').remove().catch(()=>{});
+  if (fdb) fdb.ref('pk/entries').remove().catch(()=>{});
   refreshAdminUI(); updateRprPreview();
   toast('🗑️', 'Tüm kayıtlar silindi.', 3000);
 };
@@ -3116,31 +2951,175 @@ window.exportJSON = () => {
 // ═══════════════════════════════════════
 //  TURNIKE SYSTEM
 // ═══════════════════════════════════════
+// ── TURNİKE SİSTEMİ BAŞLATMA ────────────────────────────────────────
+// Yeni hybrid sistem: Turnike QR ÜRETMEZ, sadece tarar.
+// Sol panel: "Kullanıcı QR'ı bekleniyor" gösterir.
+// Sağ panel: Kamera ile QR tarama yapar.
+// ─────────────────────────────────────────────────────────────────────
 function startTurnikeSystem() {
   if (turStarted) return;
   turStarted = true;
-  const q = document.getElementById('tur-qrcode');
-  if (q) q.innerHTML = '<div style="width:220px;height:220px;border-radius:14px;border:2px dashed rgba(79,163,247,.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:rgba(255,255,255,.75);text-align:center;padding:14px;">Turnike QR URETMEZ<br>Sadece QR tarar</div>';
-  const m = document.getElementById('tur-manuel-code');
-  if (m) m.textContent = 'SCAN';
-  const timerText = document.getElementById('tur-tv');
-  if (timerText) timerText.textContent = '--:--';
+
+  // Sol panel: Turnike artık QR üretmediğini göster
   const rfg = document.getElementById('tur-rfg');
   if (rfg) rfg.style.strokeDasharray = CIRC;
-  const pfill = document.getElementById('tur-pfill');
-  if (pfill) pfill.style.width = '0%';
+
+  // "Bekleniyor" modunu başlat (genTurQR deprecated, sadece UI güncelle)
+  genTurQR();
+
+  // Timer güncelleme — artık kullanıcı QR süresini değil sistem saatini göster
   setInterval(() => {
     const c = document.getElementById('tur-clock');
     if (c) c.textContent = new Date().toLocaleTimeString(lang === 'en' ? 'en-GB' : 'tr-TR');
   }, 1000);
+
+  // Firebase pending listener (legacy fallback — kart tarama için hâlâ gerekli)
+  setInterval(pollPendingLocal, 500);
+
+  // Timer progress bar'ı sabit göster (artık countdown değil)
+  const pf = document.getElementById('tur-pfill');
+  if (pf) pf.style.width = '100%';
+  const tv = document.getElementById('tur-tv');
+  if (tv) tv.textContent = lang==='en' ? 'READY' : 'HAZIR';
 }
 
+// ── HYBRID QR SİSTEMİ ──────────────────────────────────────────────
+// Eski sistem: Turnike QR üretir → kullanıcı tarar  [KALDIRILDI]
+// Yeni sistem: Kullanıcı kendi QR'ını üretir → Turnike tarar  [AKTİF]
+// ────────────────────────────────────────────────────────────────────
+
+// [DEPRECATED] genTurQR — Turnike artık QR üretmez. Geriye dönük
+// uyumluluk için fonksiyon korunmaktadır ama çağrılmaz.
 function genTurQR() {
-  // Turnstile does not generate QR codes.
+  console.warn('genTurQR() is deprecated — turnikeadmin no longer generates QR codes.');
+  // Turnike sol panelini "bekleniyor" moduna al
+  const el = document.getElementById('tur-qrcode');
+  if (el) {
+    el.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:140px;gap:10px;">' +
+      '<div style="font-size:36px;">📷</div>' +
+      '<div style="font-size:12px;color:rgba(255,255,255,.5);text-align:center;line-height:1.5;">' +
+        (lang==='en' ? 'Waiting to scan<br>user QR code' : 'Kullanıcı QR kodu<br>bekleniyor') +
+      '</div></div>';
+  }
+  const mcEl = document.getElementById('tur-manuel-code');
+  if (mcEl) mcEl.textContent = lang==='en' ? 'SCAN' : 'TARA';
 }
 
+// ── KULLANICI DİNAMİK QR ÜRETİMİ ──────────────────────────────────
+// Kullanıcı kendi TC'sinden kişisel, tek kullanımlık, 5 dk geçerli QR üretir.
+// Format: PARKILIT_DYN|{qrId}|{tc}|{ts}
+// qrId = benzersiz oturum kimliği (Firebase'e kaydedilir)
+// ────────────────────────────────────────────────────────────────────
+
+let userQRTimerInterval = null; // Kullanıcı QR geri sayım zamanlayıcısı
+
+function generateUserQR() {
+  if (!CU) return;
+  // Mevcut QR zamanlayıcısını temizle
+  clearInterval(userQRTimerInterval);
+
+  const qrId   = genKey() + genKey(); // Benzersiz 32 karakterli oturum ID
+  const tc     = CU.tc;
+  const name   = CU.ad + ' ' + CU.soyad;
+  const ts     = Date.now();
+  const expiry = ts + 300000; // 5 dakika (300 saniye)
+  const mode   = scanMode; // 'entry' veya 'exit'
+
+  // QR içeriği: tip|qrId|tc|timestamp
+  const qrText = 'PARKILIT_DYN|' + qrId + '|' + tc + '|' + ts;
+
+  // Firebase'e QR oturumu kaydet (tek kullanımlık, süreli)
+  DB.setQRSession(qrId, {
+    type:      'dynamic',
+    source:    'phone',
+    tc:        tc,
+    name:      name,
+    mode:      mode,
+    ts:        ts,
+    expiresAt: expiry,
+    used:      false
+  });
+
+  // Kullanıcı QR görüntüleme alanını güncelle
+  const uqrEl = document.getElementById('user-qr-display');
+  if (uqrEl) {
+    uqrEl.innerHTML = '';
+    new QRCode(uqrEl, {
+      text:         qrText,
+      width:        200,
+      height:       200,
+      colorDark:    '#1e293b',
+      colorLight:   '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }
+
+  // Mod bilgisini göster
+  const uqrMode = document.getElementById('uqr-mode-badge');
+  if (uqrMode) {
+    const x = mode === 'exit';
+    uqrMode.textContent  = t(x ? 'scan_btn_exit' : 'scan_btn_entry');
+    uqrMode.className    = 'uqr-mode-badge ' + (x ? 'out-badge' : 'in-badge');
+  }
+
+  // 5 dakikalık geri sayım
+  let remaining = 300;
+  updateUserQRTimer(remaining);
+  userQRTimerInterval = setInterval(() => {
+    remaining--;
+    updateUserQRTimer(remaining);
+    if (remaining <= 0) {
+      clearInterval(userQRTimerInterval);
+      // QR süresi doldu — yenile
+      const expired = document.getElementById('uqr-expired-msg');
+      if (expired) expired.style.display = 'flex';
+      const uqrBox = document.getElementById('user-qr-display');
+      if (uqrBox) uqrBox.style.opacity = '0.3';
+    }
+  }, 1000);
+}
+
+function updateUserQRTimer(seconds) {
+  const tv = document.getElementById('uqr-timer-val');
+  if (tv) tv.textContent = fmtTime(seconds);
+  const bar = document.getElementById('uqr-timer-bar');
+  if (bar) bar.style.width = ((seconds / 300) * 100) + '%';
+  // Son 60 saniye uyarısı
+  const timerWrap = document.getElementById('uqr-timer-wrap');
+  if (timerWrap) {
+    timerWrap.className = 'uqr-timer-wrap' + (seconds <= 60 ? ' warn' : '');
+  }
+}
+
+// Kullanıcı QR'ını yenile
+window.refreshUserQR = () => {
+  const expired = document.getElementById('uqr-expired-msg');
+  if (expired) expired.style.display = 'none';
+  const uqrBox = document.getElementById('user-qr-display');
+  if (uqrBox) uqrBox.style.opacity = '1';
+  generateUserQR();
+  toast('✅', lang==='en' ? 'QR refreshed!' : 'QR yenilendi!', 2000);
+};
+
+// [REFACTORED] updateTurTimer — Hybrid sistem: artık countdown değil sistem durumu
 function updateTurTimer() {
-  // Timer is disabled because turnstile QR generation is removed.
+  // Turnike artık QR üretmez, sadece bekler.
+  // Göstergeler sabit / sistem durumunu yansıtır.
+  const rfg = document.getElementById('tur-rfg');
+  if (rfg) { rfg.style.strokeDashoffset = 0; } // Full circle = ready
+
+  // Dil bazlı durum metni
+  const tv = document.getElementById('tur-tv');
+  if (tv) tv.textContent = lang === 'en' ? 'READY' : 'HAZIR';
+
+  const tvLbl = document.getElementById('tur-tv-lbl');
+  if (tvLbl) tvLbl.textContent = lang === 'en' ? 'SYSTEM' : 'SİSTEM';
+
+  const pf = document.getElementById('tur-pfill');
+  if (pf) pf.style.width = '100%'; // Full = ready
+  if (turTimeLeft <= 30) rfg.className = 'trfg danger';
+  else if (turTimeLeft <= 60) rfg.className = 'trfg warn';
+  else rfg.className = 'trfg';
 }
 
 window.toggleTurCam = async () => {
@@ -3160,21 +3139,21 @@ window.toggleTurCam = async () => {
       const v = document.getElementById('tur-vid');
       v.srcObject = turCamStream; v.play();
       turCamOpen = true;
+      startTurHybridScan(); // ← Hybrid QR tarama başlat (dinamik + kart)
       const el = document.getElementById('tur-cam-ov'); if (el) el.classList.add('hidden');
       const badge = document.getElementById('tur-cam-badge');
       if (badge) { badge.innerHTML = '<span class="live-dot"></span>' + t('tur_cam_live'); badge.className = 'tur-cam-badge live'; }
       const btn = document.getElementById('tur-cam-btn');
       if (btn) { btn.innerHTML = '<span class="live-dot"></span>' + t('tur_cam_close'); btn.className = 'tur-cam-toggle on'; }
       const sl = document.getElementById('tur-scan-line'); if (sl) sl.classList.add('active');
-      startAdminCardScan();
       toast('📷', t('toast_cam_open'), 3000);
     } catch(e) { toast('⚠️', t('toast_cam_denied')); }
   }
 };
 
 function stopTurCam() {
+  stopTurHybridScan(); // ← Hybrid QR taramayı durdur
   if (turCamStream) { turCamStream.getTracks().forEach(t=>t.stop()); turCamStream = null; turCamOpen = false; }
-  stopAdminCardScan();
 }
 
 function captureTurPhoto() {
@@ -3186,14 +3165,6 @@ function captureTurPhoto() {
   ctx.save(); ctx.translate(c.width, 0); ctx.scale(-1, 1);
   ctx.drawImage(v, 0, 0, c.width, c.height); ctx.restore();
   return c.toDataURL('image/jpeg', 0.5);
-}
-async function captureTurPhotoWithRetry(maxTry = 3, waitMs = 220) {
-  for (let i = 0; i < maxTry; i++) {
-    const photo = captureTurPhoto();
-    if (photo) return photo;
-    await new Promise(r => setTimeout(r, waitMs));
-  }
-  return null;
 }
 
 // Admin kamerası — üye kart QR'ı okuma
@@ -3209,15 +3180,25 @@ window.toggleAdminCardScan = () => {
   }
 };
 
-function startAdminCardScan() {
-  if (!turCamOpen) { toast('⚠️', 'Önce kamerayı açın!', 3000); return; }
-  adminCardScanActive = true;
-  const btn = document.getElementById('admin-card-scan-btn');
-  if (btn) { btn.textContent = '⏹ QR Taramayi Durdur'; btn.style.background = 'var(--red-l)'; btn.style.color = 'var(--red)'; }
-  adminCardScanInterval = setInterval(() => {
+// ── TURNİKE KAMERA QR TARAMA (Hybrid) ───────────────────────────────
+// Turnike kamerası hem kart QR (PARKILIT_CARD|) hem dinamik telefon
+// QR'ını (PARKILIT_DYN|) tarayabilir.
+// Kart modu: toggleAdminCardScan() ile manuel açılır/kapanır.
+// Dinamik mod: Turnike kamerası açıkken sürekli tarar.
+// ─────────────────────────────────────────────────────────────────────
+
+let turHybridScanInterval = null;  // Turnike hybrid QR tarama döngüsü
+let turHybridLastData = '';        // Çift okuma önleme
+let turHybridLastTime = 0;
+
+// Turnike kamerası açıldığında hybrid taramayı başlat
+function startTurHybridScan() {
+  if (turHybridScanInterval) return; // Zaten çalışıyor
+  turHybridLastData = '';
+  turHybridScanInterval = setInterval(() => {
     const v = document.getElementById('tur-vid');
     const c = document.getElementById('adm-cap-cvs');
-    if (!v || v.readyState !== v.HAVE_ENOUGH_DATA) return;
+    if (!v || v.readyState !== v.HAVE_ENOUGH_DATA || !v.videoWidth) return;
     c.width = v.videoWidth; c.height = v.videoHeight;
     const ctx = c.getContext('2d');
     ctx.save(); ctx.translate(c.width, 0); ctx.scale(-1, 1);
@@ -3225,42 +3206,49 @@ function startAdminCardScan() {
     const imgData = ctx.getImageData(0, 0, c.width, c.height);
     const code = jsQR(imgData.data, c.width, c.height, {inversionAttempts:'attemptBoth'});
     if (!code || !code.data) return;
-    const data = code.data.trim();
-    // Hybrid QR validation entry point:
-    // - preferred: qrId only
-    // - legacy fallback: PARKILIT_CARD / PARKILIT_USER
-    if (!data.includes('|')) {
-      stopAdminCardScan();
-      validateAndProcessQrId(data);
-      return;
+
+    // Çift okuma önleme (1.5 saniye)
+    const now = Date.now();
+    if (code.data === turHybridLastData && (now - turHybridLastTime) < 1500) return;
+    turHybridLastData = code.data;
+    turHybridLastTime = now;
+
+    // Hybrid QR yönlendirme
+    const data = code.data;
+    if (data.startsWith('PARKILIT_DYN|') || data.startsWith('PARKILIT_CARD|')) {
+      // Her iki tip QR'ı handleTurnikeScannedQR işler
+      handleTurnikeScannedQR(data);
     }
-    if (data.startsWith('PARKILIT_CARD|')) {
-      const parts = data.split('|');
-      if (parts.length >= 3) {
-        const tc = parts[1];
-        const name = parts[2];
-        stopAdminCardScan();
-        handleAdminCardEntry(tc, name);
-      }
-      return;
-    }
-    if (data.startsWith('PARKILIT_USER|')) {
-      const parts = data.split('|');
-      if (parts.length >= 3) {
-        const tc = parts[1];
-        const qrid = parts[2];
-        stopAdminCardScan();
-        validateAndProcessQrId(qrid, tc);
-      }
-    }
+    // Kart tarama aktifse ek olarak adminCardScan da işler (aşağıda)
   }, 200);
+}
+
+// Turnike kamerası kapandığında hybrid taramayı durdur
+function stopTurHybridScan() {
+  clearInterval(turHybridScanInterval);
+  turHybridScanInterval = null;
+  turHybridLastData = '';
+}
+
+// Admin Card Scan — kart QR okuma modu (ayrı toggle)
+function startAdminCardScan() {
+  if (!turCamOpen) { toast('⚠️', 'Önce kamerayı açın!', 3000); return; }
+  adminCardScanActive = true;
+  const btn = document.getElementById('admin-card-scan-btn');
+  if (btn) { btn.textContent = '⏹ Taramayı Durdur'; btn.style.background = 'var(--red-l)'; btn.style.color = 'var(--red)'; }
+  // Not: Kart tarama artık startTurHybridScan() içinde entegre edilmiştir.
+  // Bu interval sadece kart tarama modunda ek görsel/ses geri bildirimi için.
+  adminCardScanInterval = setInterval(() => {
+    // Hybrid scan zaten her iki QR tipini işliyor.
+    // Bu interval boş bırakıldı — stopAdminCardScan() için interval ref gerekli.
+  }, 500);
 }
 
 function stopAdminCardScan() {
   adminCardScanActive = false;
   clearInterval(adminCardScanInterval);
   const btn = document.getElementById('admin-card-scan-btn');
-  if (btn) { btn.textContent = '📷 QR Tara'; btn.style.background = 'var(--blue-l)'; btn.style.color = 'var(--blue)'; }
+  if (btn) { btn.textContent = '🪪 Kart QR Oku'; btn.style.background = 'var(--blue-l)'; btn.style.color = 'var(--blue)'; }
 }
 
 function handleAdminCardEntry(tc, name) {
@@ -3268,82 +3256,21 @@ function handleAdminCardEntry(tc, name) {
   let users = DB.getUsers();
   let user = users.find(u => u.tc === tc);
   if (!user) { toast('⚠️', tc + ' TC ile kayıtlı kullanıcı bulunamadı.', 4000); return; }
-  processTurnikeAccess(tc, name, 'card_scan');
-}
-
-function handleTurnikeUserQR(tc, qrId) {
-  const users = DB.getUsers();
-  const user = users.find(u => u.tc === tc);
-  if (!user) { toast('⚠️', 'Gecersiz kullanici QR kodu.', 3500); return; }
-  const qr = getQrSession(qrId);
-  if (!qr || qr.tc !== tc) { toast('⚠️', 'Sahte veya gecersiz QR kodu.', 3500); return; }
-  const realName = (user.ad + ' ' + user.soyad).trim();
-  processTurnikeAccess(tc, realName, 'user_qr');
-}
-
-function validateAndProcessQrId(qrId, expectedTc = null) {
-  const s = getQrSession(qrId);
-  if (!s || !s.tc) { toast('⚠️', 'Bilinmeyen QR kodu.', 3500); startAdminCardScan(); return; }
-  if (expectedTc && s.tc !== expectedTc) { toast('⚠️', 'QR TC eslesmedi.', 3500); startAdminCardScan(); return; }
-  const user = DB.getUsers().find(u => u.tc === s.tc);
-  if (!user) { toast('⚠️', 'QR kullanicisi bulunamadi.', 3500); startAdminCardScan(); return; }
-  if (s.qrType === 'dynamic_user') {
-    if (s.used) { toast('⚠️', 'Bu dinamik QR zaten kullanilmis.', 3500); startAdminCardScan(); return; }
-    if ((s.expiresAt || 0) < Date.now()) { toast('⚠️', 'Dinamik QR suresi dolmus.', 3500); startAdminCardScan(); return; }
-  } else if (s.qrType === 'admin_card') {
-    if (s.active === false) { toast('⚠️', 'Kart QR devre disi.', 3500); startAdminCardScan(); return; }
-  } else {
-    toast('⚠️', 'Desteklenmeyen QR tipi.', 3500); startAdminCardScan(); return;
-  }
-  const fullName = (user.ad + ' ' + user.soyad).trim();
-  processTurnikeAccess(s.tc, fullName, s.qrType, s);
-}
-
-let turnikeLock = false;
-async function processTurnikeAccess(tc, name, source, qrSession = null) {
-  if (turnikeLock) { toast('⚠️', 'Turnike islemde, lutfen bekleyin.', 2000); return; }
-  turnikeLock = true;
   const st = DB.getStatus(tc);
   const mode = st === 'inside' ? 'exit' : 'entry';
-  if (mode === 'entry' && st === 'inside') { toast('⚠️', 'Kullanici zaten iceride.', 3000); turnikeLock = false; return; }
-  if (mode === 'exit' && st === 'outside') { toast('⚠️', 'Kullanici zaten disarida.', 3000); turnikeLock = false; return; }
-  const photo = await captureTurPhotoWithRetry(3, 250);
-  if (!photo) {
-    toast('❌', 'Fotograf alinamadi. Islem iptal edildi.', 4000);
-    turnikeLock = false;
-    startAdminCardScan();
-    return;
-  }
+  // Fotoğraf çek
+  const photo = captureTurPhoto();
   if (photo) {
     const img = document.getElementById(mode==='exit'?'tur-lp-out':'tur-lp-in');
     const slot = document.getElementById(mode==='exit'?'tps-out':'tps-in');
     if (img) { img.src = photo; img.classList.add('loaded'); }
     if (slot) slot.querySelectorAll('span').forEach(s => s.style.display='none');
   }
-  const entry = {
-    mode,
-    type: mode,
-    tc,
-    name,
-    time: new Date().toLocaleTimeString(lang==='en'?'en-GB':'tr-TR'),
-    timestamp: Date.now(),
-    photo,
-    source
-  };
-  const ok = DB.addEntry(entry);
-  if (!ok) {
-    toast('❌', 'Log kaydi olusturulamadi. Islem iptal edildi.', 4000);
-    turnikeLock = false;
-    startAdminCardScan();
-    return;
-  }
-  DB.setStatus(tc, mode==='exit'?'outside':'inside');
-  if (qrSession && qrSession.qrType === 'dynamic_user') markQrSessionUsed(qrSession.qrId);
+  const entry = { mode, tc, name, time: new Date().toLocaleTimeString(lang==='en'?'en-GB':'tr-TR'), timestamp: Date.now(), photo, source: 'card_scan' };
+  DB.addEntry(entry); DB.setStatus(tc, mode==='exit'?'outside':'inside');
   showTkOv(entry, photo);
   toast(mode==='exit'?'🚪':'✅', name + (mode==='exit'?' çıkış yaptı.'  :' giriş yaptı.'), 4000);
   turFlash();
-  turnikeLock = false;
-  startAdminCardScan();
 }
 
 function turFlash() {
@@ -3367,11 +3294,6 @@ function handleTurnikePending(p) {
   setTimeout(() => {
     let photo = null;
     if (turCamOpen) { turFlash(); photo = captureTurPhoto(); showTurDet(p.mode, p.name); }
-    if (!photo) {
-      DB.clearPending();
-      toast('❌', 'Fotograf zorunlu. Islem bloklandi.', 3500);
-      return;
-    }
     if (photo) {
       const img = document.getElementById(p.mode==='exit'?'tur-lp-out':'tur-lp-in');
       const slot = document.getElementById(p.mode==='exit'?'tps-out':'tps-in');
@@ -3430,9 +3352,9 @@ function setupScanUI() {
   const scanSub = document.getElementById('scan-sub');
   const scanHint = document.getElementById('scan-hint');
   const sstTxt = document.getElementById('sst-txt');
-  if (scanTitle) scanTitle.textContent = 'Kisisel QR Kod';
-  if (scanSub) scanSub.textContent = 'Turnike kamerasi bu QR kodu okuyarak giris/cikis yapar';
-  if (scanHint) scanHint.textContent = 'QR kodunu turnikeye gosterin';
+  if (scanTitle) scanTitle.textContent = t(x?'scan_exit_title':'scan_entry_title');
+  if (scanSub) scanSub.textContent = t(x?'scan_exit_sub':'scan_entry_sub');
+  if (scanHint) scanHint.textContent = t(x?'scan_exit_hint':'scan_entry_hint');
   if (sstTxt) sstTxt.textContent = t(x?'scan_exit_scanning':'scan_scanning');
   ['sc-tl','sc-tr','sc-bl','sc-br'].forEach(id => {
     const el = document.getElementById(id);
@@ -3449,31 +3371,58 @@ function setupScanUI() {
   const sst = document.getElementById('sst');
   if (sst) sst.className = 'sst ' + (x?'xon':'on');
   const be = document.getElementById('btn-entry'), bx = document.getElementById('btn-exit');
-  if (be) { be.className = 'smb in-btn' + (x?'':' active-smb'); be.style.opacity = '0.45'; be.disabled = true; }
-  if (bx) { bx.className = 'smb out-btn' + (x?' active-smb':''); bx.style.opacity = '0.45'; bx.disabled = true; }
-  renderUserQR();
+  if (be) { be.className = 'smb in-btn' + (x?'':' active-smb'); be.style.opacity = st==='inside'?'0.4':'1'; }
+  if (bx) { bx.className = 'smb out-btn' + (x?' active-smb':''); bx.style.opacity = st==='outside'?'0.4':'1'; }
 }
 
 window.switchMode = (mode) => {
-  toast('ℹ️', 'Giris/cikis modu turnike dogrulamasi ile otomatik belirlenir.', 3000);
+  const st = DB.getStatus(CU ? CU.tc : '');
+  if (mode==='entry' && st==='inside') { toast('⚠️', t('toast_already_in'), 3500); return; }
+  if (mode==='exit'  && st==='outside'){ toast('⚠️', t('toast_already_out'), 3500); return; }
+  scanMode = mode;
+  setupScanUI();
+  // ← Hybrid: Mod değişince yeni QR üret (mod bilgisi QR içine gömülü)
+  generateUserQR();
 };
 
 async function startQRCam() {
-  stopQRCam();
-  const v = document.getElementById('vid');
-  if (v) {
-    v.style.display = 'none';
-    try { v.srcObject = null; } catch(e) {}
+  try {
+    // Önce arka kamera dene, olmazsa herhangi bir kamera
+    const constraints = {
+      video: {
+        facingMode: { ideal: 'environment' },
+        width:  { min: 480, ideal: 1280, max: 1920 },
+        height: { min: 480, ideal: 720,  max: 1080 },
+        frameRate: { ideal: 30, max: 60 },
+        focusMode: 'continuous',
+        zoom: 1.0,
+      }
+    };
+    try {
+      qrStream = await navigator.mediaDevices.getUserMedia(constraints);
+    } catch(e1) {
+      // Fallback
+      qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    }
+    const v = document.getElementById('vid');
+    v.srcObject = qrStream;
+    v.setAttribute('playsinline', true);
+    v.onloadedmetadata = () => {
+      v.play();
+      scanning = true; lastQRData = '';
+      clearInterval(scanInt);
+      // Cihaz hızına göre frame rate ayarla
+      const fps = v.videoWidth > 1000 ? 150 : 100; // Yüksek çözünürlükte daha sık tara
+      scanInt = setInterval(frame, fps);
+    };
+  } catch(e) {
+    toast('⚠️', t('toast_cam_denied'));
   }
-  renderUserQR();
-  clearInterval(userQrRefreshInt);
-  userQrRefreshInt = setInterval(renderUserQR, 15000);
 }
 
 function stopQRCam() {
   if (qrStream) { qrStream.getTracks().forEach(t=>t.stop()); qrStream = null; }
   clearInterval(scanInt); scanning = false;
-  clearInterval(userQrRefreshInt);
 }
 
 // QR okuma için özel canvas ve context — her frame yeniden oluşturma
@@ -3513,8 +3462,217 @@ function frame() {
   }
 }
 
+// ── KULLANICI QR TARAMA (Kullanıcı telefonunda QR'ını gösterir) ────────
+// Kullanıcı kendi dinamik QR'ını oluşturur ve turnike kamerasına gösterir.
+// Bu fonksiyon artık kullanıcı ekranında startQRCam ile ÇALIŞMAZ.
+// Bunun yerine kullanıcı ekranında generateUserQR() çağrılır.
+// Geriye dönük uyumluluk için korunmuştur.
 function handleQR(data) {
-  // User-side camera scanning removed. Turnstile is the only QR scanner.
+  // Legacy: eski PARKILIT| formatı (turnike QR) — artık kullanılmıyor
+  // Yeni format PARKILIT_DYN| ve PARKILIT_CARD| ile handleTurnikeScannedQR işler
+  if (!scanning) return;
+  scanning = false; clearInterval(scanInt);
+
+  // Yeni hybrid sistem: her iki QR tipini de yönlendir
+  if (data.startsWith('PARKILIT_DYN|') || data.startsWith('PARKILIT_CARD|')) {
+    // Bu QR kodları turnike kamerası tarafından taranmalıdır, kullanıcı ekranında değil
+    document.getElementById('err-desc').textContent =
+      lang==='en' ? 'Please show this QR to the turnstile camera.' : 'Bu QR'ı turnike kamerasına gösterin.';
+    stopQRCam(); navigate('/app/error');
+    return;
+  }
+
+  // Legacy PARKILIT| formatı — eski uyumluluk
+  const parts = data.split('|');
+  if (parts.length !== 3 || parts[0] !== 'PARKILIT') {
+    document.getElementById('err-desc').textContent = t('err_not_parkilit');
+    stopQRCam(); navigate('/app/error'); return;
+  }
+  const ts = parseInt(parts[2]), diff = Date.now() - ts;
+  if (isNaN(ts) || diff > 300000) {
+    document.getElementById('err-desc').textContent = t('err_expired');
+    stopQRCam(); navigate('/app/error'); return;
+  }
+  const st = DB.getStatus(CU.tc);
+  if (scanMode==='entry' && st==='inside') {
+    document.getElementById('err-desc').textContent = t('err_already_in');
+    stopQRCam(); navigate('/app/error'); return;
+  }
+  if (scanMode==='exit' && st==='outside') {
+    document.getElementById('err-desc').textContent = t('err_already_out');
+    stopQRCam(); navigate('/app/error'); return;
+  }
+  stopQRCam();
+  if (navigator.vibrate) navigator.vibrate([60,30,120]);
+  const now = new Date(), saat = now.toLocaleTimeString(lang==='en'?'en-GB':'tr-TR');
+  const entry = { mode: scanMode, tc: CU.tc, name: CU.ad+' '+CU.soyad, time: saat, timestamp: Date.now(), photo: null };
+  DB.clearResult(); DB.setPending(entry);
+  const started = Date.now();
+  clearInterval(waitPoll);
+  window._resultHandler = (res) => {
+    clearInterval(waitPoll); DB.clearResult(); DB.clearPending();
+    DB.addEntry(res); DB.setStatus(CU.tc, scanMode==='exit'?'outside':'inside');
+    showSuccess(res);
+  };
+  waitPoll = setInterval(() => {
+    const res = DB.getResult();
+    if (res && res.tc === CU.tc) {
+      clearInterval(waitPoll); window._resultHandler = null;
+      DB.clearResult(); DB.clearPending();
+      DB.addEntry(res); DB.setStatus(CU.tc, scanMode==='exit'?'outside':'inside');
+      showSuccess(res);
+    } else if (Date.now() - started >= 3500) {
+      clearInterval(waitPoll); window._resultHandler = null;
+      DB.clearPending(); DB.addEntry(entry);
+      DB.setStatus(CU.tc, scanMode==='exit'?'outside':'inside');
+      showSuccess(entry);
+    }
+  }, 200);
+  showSuccess(entry);
+}
+
+// ── TURNİKE KAMERA QR DOĞRULAMA (Ana hybrid akış) ────────────────────
+// Turnike kamerası kullanıcının QR kodunu tarar.
+// Hem dinamik (telefon) hem statik (kart) QR'ı işler.
+// Firebase'den doğrulama yapar → giriş/çıkış kaydı + fotoğraf çeker.
+// ─────────────────────────────────────────────────────────────────────
+function handleTurnikeScannedQR(data) {
+  if (!data || typeof data !== 'string') return;
+
+  const isDynamic = data.startsWith('PARKILIT_DYN|');
+  const isCard    = data.startsWith('PARKILIT_CARD|');
+
+  if (!isDynamic && !isCard) {
+    // Tanınmayan QR formatı
+    toast('⚠️', lang==='en' ? 'Unknown QR format' : 'Tanınmayan QR formatı', 3000);
+    return;
+  }
+
+  if (isCard) {
+    // ── STATİK KART QR ────────────────────────────────────────────────
+    // Format: PARKILIT_CARD|{tc}|{name}
+    // Admin tarafından oluşturulan fiziksel kart
+    const parts = data.split('|');
+    if (parts.length >= 3) {
+      const tc   = parts[1];
+      const name = parts[2];
+      // Kart QR'ını kart tarama sistemi ile işle (mevcut handleAdminCardEntry)
+      handleAdminCardEntry(tc, name);
+    } else {
+      toast('⚠️', lang==='en' ? 'Invalid card QR' : 'Geçersiz kart QR', 3000);
+    }
+    return;
+  }
+
+  // ── DİNAMİK TELEFON QR ───────────────────────────────────────────────
+  // Format: PARKILIT_DYN|{qrId}|{tc}|{timestamp}
+  const parts = data.split('|');
+  if (parts.length < 4) {
+    toast('⚠️', lang==='en' ? 'Invalid QR format' : 'Geçersiz QR formatı', 3000);
+    return;
+  }
+
+  const qrId = parts[1];
+  const tc   = parts[2];
+  const ts   = parseInt(parts[3]);
+  const now  = Date.now();
+
+  // 1. Zaman kontrolü — client-side hızlı kontrol (5 dk)
+  if (isNaN(ts) || (now - ts) > 300000) {
+    toast('⚠️', lang==='en' ? 'QR code expired' : 'QR kodu süresi dolmuş', 3000);
+    turFlash();
+    return;
+  }
+
+  // 2. Firebase'den QR oturumunu doğrula (backend doğrulama)
+  DB.getQRSession(qrId, (session) => {
+    if (!session) {
+      toast('⚠️', lang==='en' ? 'QR not found in database' : 'QR veritabanında bulunamadı', 3000);
+      return;
+    }
+
+    // 3. Tek kullanım kontrolü
+    if (session.used === true) {
+      toast('⚠️', lang==='en' ? 'QR already used' : 'QR daha önce kullanılmış', 3000);
+      return;
+    }
+
+    // 4. Süre kontrolü (Firebase tarafı)
+    if (session.expiresAt && now > session.expiresAt) {
+      toast('⚠️', lang==='en' ? 'QR session expired' : 'QR oturumu süresi dolmuş', 3000);
+      return;
+    }
+
+    // 5. TC eşleşmesi kontrolü
+    if (session.tc !== tc) {
+      toast('⚠️', lang==='en' ? 'QR mismatch' : 'QR uyuşmazlığı', 3000);
+      return;
+    }
+
+    // 6. Kullanıcı varlık kontrolü
+    const users = DB.getUsers();
+    const user  = users.find(u => u.tc === tc);
+    if (!user) {
+      toast('⚠️', lang==='en' ? 'User not registered' : 'Kullanıcı kayıtlı değil', 3000);
+      return;
+    }
+
+    // 7. Giriş/çıkış durumu kontrolü
+    const currentStatus = DB.getStatus(tc);
+    const mode = session.mode || (currentStatus === 'inside' ? 'exit' : 'entry');
+
+    if (mode === 'entry' && currentStatus === 'inside') {
+      toast('⚠️', lang==='en' ? 'User already inside' : 'Kullanıcı zaten içeride', 3000);
+      return;
+    }
+    if (mode === 'exit' && currentStatus === 'outside') {
+      toast('⚠️', lang==='en' ? 'User already outside' : 'Kullanıcı zaten dışarıda', 3000);
+      return;
+    }
+
+    // ✅ TÜM KONTROLLER BAŞARILI — Giriş/çıkış işle
+
+    // 8. Dynamic QR'ı geçersiz kıl (tek kullanım)
+    DB.invalidateQRSession(qrId);
+
+    // 9. Fotoğraf çek
+    const photo = captureTurPhoto();
+    if (photo) {
+      const img  = document.getElementById(mode==='exit' ? 'tur-lp-out' : 'tur-lp-in');
+      const slot = document.getElementById(mode==='exit' ? 'tps-out' : 'tps-in');
+      if (img)  { img.src = photo; img.classList.add('loaded'); }
+      if (slot) slot.querySelectorAll('span').forEach(s => s.style.display = 'none');
+    }
+
+    // 10. Giriş kaydını oluştur
+    const saat  = new Date().toLocaleTimeString(lang === 'en' ? 'en-GB' : 'tr-TR');
+    const name  = user.ad + ' ' + user.soyad;
+    const entry = {
+      mode, tc, name,
+      time:      saat,
+      timestamp: now,
+      photo:     photo,
+      source:    'dynamic_qr'  // Kaynak: dinamik telefon QR
+    };
+
+    // 11. Firebase ve localStorage'a kaydet
+    DB.addEntry(entry);
+    DB.setStatus(tc, mode === 'exit' ? 'outside' : 'inside');
+
+    // 12. UI güncelle
+    showTkOv(entry, photo);
+    showTurDet(mode, name);
+    turFlash();
+
+    if (navigator.vibrate) navigator.vibrate([60, 30, 120]);
+    toast(
+      mode === 'exit' ? '🚪' : '✅',
+      name + (mode === 'exit'
+        ? (lang === 'en' ? ' exited.' : ' çıkış yaptı.')
+        : (lang === 'en' ? ' entered.' : ' giriş yaptı.')),
+      4000
+    );
+  });
 }
 
 function showSuccess(entry) {
@@ -3553,7 +3711,35 @@ window.toggleManuel = () => {
   if (w.classList.contains('open')) setTimeout(() => document.getElementById('manuel-inp').focus(), 350);
 };
 window.doManuel = () => {
-  toast('ℹ️', 'Manuel kod akisi kaldirildi. Kisisel veya admin kart QR okutun.', 3500);
+  const code = document.getElementById('manuel-inp').value.trim().toUpperCase();
+  if (code.length < 4) { toast('⚠️', t('toast_min_chars')); return; }
+  const st = DB.getStatus(CU.tc);
+  if (scanMode==='entry' && st==='inside') { toast('⚠️', t('toast_already_in'), 3500); return; }
+  if (scanMode==='exit'  && st==='outside'){ toast('⚠️', t('toast_already_out'), 3500); return; }
+  const qrData = DB.getQR();
+  if (!qrData) { toast('❌', t('toast_no_qr')); return; }
+  if (Date.now() - qrData.ts > 300000) { toast('❌', t('toast_qr_expired')); return; }
+  const mc = (qrData.mc || qrData.key.substring(0,6)).toUpperCase();
+  if (!mc.startsWith(code.substring(0, Math.min(code.length, 6)))) { toast('❌', t('toast_wrong_code')); return; }
+  document.getElementById('manuel-inp').value = '';
+  document.getElementById('manuel-wrap').classList.remove('open');
+  scanning = false; clearInterval(scanInt); stopQRCam();
+  if (navigator.vibrate) navigator.vibrate([60,30,120]);
+  const now = new Date(), saat = now.toLocaleTimeString(lang==='en'?'en-GB':'tr-TR');
+  const entry = { mode: scanMode, tc: CU.tc, name: CU.ad+' '+CU.soyad, time: saat, timestamp: Date.now(), photo: null, source: 'manuel' };
+  DB.clearResult(); DB.setPending(entry);
+  const started = Date.now(); clearInterval(waitPoll);
+  waitPoll = setInterval(() => {
+    const res = DB.getResult();
+    if (res && res.tc === CU.tc) {
+      clearInterval(waitPoll); DB.clearResult(); DB.clearPending();
+      DB.addEntry(res); DB.setStatus(CU.tc, scanMode==='exit'?'outside':'inside'); showSuccess(res);
+    } else if (Date.now()-started >= 3500) {
+      clearInterval(waitPoll); DB.clearPending();
+      DB.addEntry(entry); DB.setStatus(CU.tc, scanMode==='exit'?'outside':'inside'); showSuccess(entry);
+    }
+  }, 200);
+  showSuccess(entry);
 };
 
 // CONFETTI
@@ -3605,8 +3791,6 @@ function launchConfetti() {
 //  INIT
 // ═══════════════════════════════════════
 function init() {
-  // Cleanup stale legacy local cache keys once.
-  ['pk_qr', 'pk_pending', 'pk_result'].forEach(k => localStorage.removeItem(k));
   // Firebase'i başlat (SDK yüklendikten sonra)
   if (typeof firebase !== 'undefined') {
     initFirebase();
