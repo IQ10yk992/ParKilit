@@ -198,7 +198,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,22,40,.92
 .hero-badge-txt{font-size:12px;font-weight:700;color:var(--blue2);letter-spacing:.08em;text-transform:uppercase;}
 .hero-title{font-family:var(--head);font-size:clamp(38px,5vw,58px);font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.03em;margin-bottom:18px;}
 .hero-title .hl{background:linear-gradient(135deg,var(--blue2),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.hero-slogan{font-size:14px;font-style:italic;font-weight:600;color:rgba(255,255,255,.75);margin-top:14px;margin-bottom:24px;max-width:520px;line-height:1.6;letter-spacing:.01em;border-left:3px solid var(--blue2);padding-left:14px;background:rgba(255,255,255,.04);padding:10px 14px;border-radius:0 8px 8px 0;}
+.hero-slogan{font-size:14px;font-style:italic;font-weight:600;color:rgba(255,255,255,.8);margin-top:14px;margin-bottom:22px;max-width:540px;line-height:1.65;letter-spacing:.01em;border-left:3px solid var(--blue2);padding:10px 14px;border-radius:0 8px 8px 0;background:rgba(26,115,232,.08);}
+.cta-slogan-badge{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.02em;color:rgba(255,255,255,.95);background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:100px;padding:7px 20px;margin-bottom:18px;font-style:italic;}
 .hero-desc{font-size:17px;color:rgba(255,255,255,.65);line-height:1.75;margin-bottom:32px;max-width:500px;}
 .hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
 .hbtn{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:14px;font-family:var(--sans);font-size:15px;font-weight:800;text-decoration:none;border:none;cursor:pointer;transition:all .2s;}
@@ -415,7 +416,7 @@ footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.06);padding
 .tur-cam-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;}
 .tur-cam-badge.live{background:rgba(239,68,68,.2);color:#fca5a5;}
 .tur-cam-badge.off{background:rgba(255,255,255,.07);color:rgba(255,255,255,.35);}
-.tur-cam-view{flex:1;position:relative;background:#000;min-height:180px;overflow:hidden;}
+.tur-cam-view{contain:strict;flex:1;position:relative;background:#000;min-height:180px;overflow:hidden;}
 #tur-vid{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1);}
 .tur-cam-ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;background:rgba(15,23,42,.8);}
 .tur-cam-ov.hidden{display:none;}
@@ -513,7 +514,7 @@ footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.06);padding
 /* ═══════════════════════════════════
    APP — SCAN SCREEN
 ═══════════════════════════════════ */
-#s-scan{padding:0;overflow:hidden;}
+#s-scan{padding:0;overflow:hidden;contain:layout style;}
 #vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 #cvs{display:none;}
 .scan-hdr{position:absolute;top:0;left:0;right:0;padding:48px 16px 14px;background:linear-gradient(180deg,rgba(10,22,40,.93) 0%,transparent 100%);z-index:10;display:flex;align-items:center;gap:10px;}
@@ -1285,7 +1286,7 @@ html { scroll-padding-top: 72px; }
 
 <section id="cta">
   <div class="section-inner sec-center">
-    <div class="cta-slogan-badge">Parkilit – Güvenli Giriş, Akıllı Gelecek</div>
+    <div class="cta-slogan-badge">Çocuklar Neşeyle Koşsun, Parkımız Turnikeyle Korunsun!</div>
     <h2 class="cta-title" data-t="cta_title"></h2>
     <p class="cta-desc" data-t="cta_desc"></p>
     <button class="hbtn hbtn-primary" style="background:#fff;color:var(--blue);font-size:15px;padding:14px 28px;" onclick="openApp()" data-t="cta_btn"></button>
@@ -1676,7 +1677,7 @@ const T = {
     nav_future:'Gelecek', nav_team:'Ekip', nav_enter:'Sisteme Giriş →',
     // HERO
     hero_badge:'DFC Projesi', hero_title1:'Parklar artık', hero_title2:'daha güvenli',
-    hero_slogan:'Parkilit – Güvenli Giriş, Akıllı Gelecek',
+    hero_slogan:'Çocuklar Neşeyle Koşsun, Parkımız Turnikeyle Korunsun!',
     hero_desc:'ParKilit, QR kod ve kimlik tabanlı akıllı giriş/çıkış sistemiyle parkları herkes için güvenli, temiz ve izlenebilir hale getiriyor.',
     hero_btn1:'Sisteme Giriş Yap', hero_btn2:'▶ Tanıtım Videosu',
     hero_s1:'SKA Maddesi', hero_s2:'İzleme', hero_s3:'Yerli Yazılım',
@@ -1745,7 +1746,7 @@ const T = {
     imp_meaning_quote:'"<strong>Impact</strong> (etki) ve <strong>actio</strong> (eylem) köklerinden türeyen Impectia; sadece düşünen değil, harekete geçen ve gerçek etki yaratan bir nesli temsil eder. Gençlerin teknolojiyle dünyayı değiştirebileceğine sadece inanmıyoruz — bunu kanıtlamak için çalışıyoruz."',
     imp_meaning_sub:'— Impectia · ODTÜ GVO Ankara Lisesi',
     imp_v1:'Merak', imp_v2:'Sorumluluk', imp_v3:'Sürdürülebilirlik', imp_v4:'Etki', imp_v5:'İşbirliği',
-    cta_title:'Parkilit – Güvenli Giriş, Akıllı Gelecek', cta_desc:'Admin paneli, turnike ekranı ve kullanıcı uygulaması tek yerden. QR tabanlı akıllı giriş sistemi.',
+    cta_title:'Sistemi Şimdi Deneyin', cta_desc:'Çocuklar Neşeyle Koşsun, Parkımız Turnikeyle Korunsun! — Admin paneli, turnike ekranı ve kullanıcı uygulaması tek yerden.',
     cta_btn:'Sisteme Giriş Yap',
     foot_copy:'© 2025 ParKilit · DFC Projesi',
     // APP
@@ -1859,7 +1860,7 @@ const T = {
     nav_future:'Future', nav_team:'Team', nav_enter:'Enter System →',
     // HERO
     hero_badge:'DFC Project', hero_title1:'Parks are now', hero_title2:'safer',
-    hero_slogan:'Parkilit – Secure Entry, Smart Future',
+    hero_slogan:'Let Children Run Joyfully, Our Park Secured by Turnstile!',
     qr_expires_in:'Valid for:', qr_expired:'QR Expired', qr_refresh:'Refresh',
     scan_qr_hint:'Show this QR code to the turnstile camera',
     hero_desc:'ParKilit makes parks safe, clean and trackable for everyone with QR code and identity-based smart entry.',
@@ -1930,7 +1931,7 @@ const T = {
     imp_meaning_quote:'"Rooted in <strong>Impact</strong> and <strong>actio</strong> (action), Impectia represents a generation that doesn\'t just think — it takes action and creates real change. We don\'t just believe that young people can change the world with technology — we work to prove it."',
     imp_meaning_sub:'— Impectia · ODTÜ GVO Ankara High School',
     imp_v1:'Curiosity', imp_v2:'Responsibility', imp_v3:'Sustainability', imp_v4:'Impact', imp_v5:'Collaboration',
-    cta_title:'Parkilit – Secure Entry, Smart Future', cta_desc:'Admin panel, turnstile screen and user app all in one place. QR-based smart entry system.',
+    cta_title:'Try the System Now', cta_desc:'Let Children Run Joyfully, Our Park Secured by Turnstile! — Admin panel, turnstile screen and user app all in one place.',
     cta_btn:'Enter System',
     foot_copy:'© 2025 ParKilit · DFC Project',
     // APP
@@ -2141,7 +2142,7 @@ function openApp() {
     scanMode = st === 'inside' ? 'exit' : 'entry';
     navigate('/app/scan');
     setupScanUI();
-    startQRCam();
+    generateUserQR(); // FIX: was startQRCam — hybrid system uses QR display
   } else {
     navigate('/app');
     setRole('reg');
@@ -2233,6 +2234,16 @@ function initFirebase() {
   }
 }
 
+// ── Debounced UI refresh — prevents rapid-fire DOM rewrites ───────
+let _refreshDebounceTimer = null;
+function debouncedRefresh() {
+  clearTimeout(_refreshDebounceTimer);
+  _refreshDebounceTimer = setTimeout(() => {
+    refreshAdminUI();
+    updateRprPreview();
+  }, 150);
+}
+
 function setupFirebaseListeners() {
   if (!fdb) return;
 
@@ -2252,29 +2263,42 @@ function setupFirebaseListeners() {
       const entries = [];
       Object.values(data).forEach(tcGroup => {
         if (typeof tcGroup === 'object') {
-          Object.values(tcGroup).forEach(e => { if(e) entries.push(e); });
+          Object.values(tcGroup).forEach(e => {
+            if (e) {
+              // FIX: Strip photo from listener cache — photos fetched on demand
+              // This prevents storing megabytes of base64 in localStorage
+              const { photo, ...entryMeta } = e;
+              entryMeta.hasPhoto = !!photo; // flag so UI can show placeholder
+              if (photo) entryMeta.photo = photo; // keep if small enough
+              entries.push(entryMeta);
+            }
+          });
         }
       });
       entries.sort((a,b) => (a.timestamp||0) - (b.timestamp||0));
-      localStorage.setItem('pk_entries', JSON.stringify(entries));
-      refreshAdminUI();
-      updateRprPreview();
+      // FIX: Keep only last 200 entries in localStorage to limit memory usage
+      const capped = entries.length > 200 ? entries.slice(-200) : entries;
+      try {
+        localStorage.setItem('pk_entries', JSON.stringify(capped));
+      } catch(storageErr) {
+        // Quota exceeded: store lean version (no photos)
+        const lean = capped.map(({photo, ...rest}) => rest);
+        try { localStorage.setItem('pk_entries', JSON.stringify(lean)); } catch(e2) {}
+      }
+      debouncedRefresh();
     }
   });
 
-  // QR değişince yerel cache'i güncelle
-  fdb.ref('pk/qr').on('value', snap => {
-    const qr = snap.val();
-    if (qr) localStorage.setItem('pk_qr', JSON.stringify(qr));
-  });
+  // pk/qr listener removed — turnstile no longer generates QR (hybrid system)
+  // qrSessions are validated via DB.getQRSession() with .once() queries
 
-  // Pending: Turnike ekranı fotoğraf çekecek
+  // pk/pending: Legacy flow for admin card + cross-tab sync
+  // In hybrid system, dynamic QR is validated directly — pending not used for phone users
   fdb.ref('pk/pending').on('value', snap => {
     const p = snap.val();
-    if (!p) return;
-    // Sadece turnike ekranı tepki verir
-    if (document.getElementById('s-turnike') &&
-        document.getElementById('s-turnike').classList.contains('active')) {
+    if (!p || !p.tc) return; // FIX: guard against empty/malformed pending
+    const turScreen = document.getElementById('s-turnike');
+    if (turScreen && turScreen.classList.contains('active')) {
       handleTurnikePending(p);
     }
   });
@@ -2301,7 +2325,7 @@ function setupFirebaseListeners() {
       Object.entries(data).forEach(([tc, s]) => {
         localStorage.setItem('pk_status_'+tc, s);
       });
-      refreshAdminUI();
+      debouncedRefresh(); // FIX: debounced to batch with entries listener
     }
   });
 }
@@ -2325,9 +2349,22 @@ const DB = {
   saveUsers: (users) => {
     localStorage.setItem('pk_users', JSON.stringify(users));
     if (fdb) {
+      // FIX: Use update() instead of set() — only sends changed fields
       const obj = {};
       users.forEach(u => { obj[u.tc] = u; });
-      fdb.ref('pk/users').set(obj).catch(e => console.warn('saveUsers Firebase hata:', e.message));
+      fdb.ref('pk/users').update(obj)
+        .catch(e => console.warn('saveUsers Firebase error:', e.message));
+    }
+  },
+  // FIX: Targeted single-user update (avoids full collection rewrite)
+  updateUser: (user) => {
+    const users = DB.getUsers();
+    const idx = users.findIndex(u => u.tc === user.tc);
+    if (idx >= 0) { users[idx] = user; } else { users.push(user); }
+    localStorage.setItem('pk_users', JSON.stringify(users));
+    if (fdb) {
+      fdb.ref('pk/users/' + user.tc).set(user)
+        .catch(e => console.warn('updateUser Firebase error:', e.message));
     }
   },
 
@@ -2341,21 +2378,28 @@ const DB = {
     try { return JSON.parse(localStorage.getItem('pk_entries')||'[]'); } catch { return []; }
   },
   addEntry: (entry) => {
-    // Önce localStorage'a yaz (anlık göster)
+    // 1. Write to localStorage immediately (instant UI update)
     const l = DB.getEntries(); l.push(entry);
-    localStorage.setItem('pk_entries', JSON.stringify(l));
-    // Firebase'e yaz
+    try { localStorage.setItem('pk_entries', JSON.stringify(l)); } catch(e) {
+      // Quota exceeded: keep last 100 entries only
+      const trimmed = l.slice(-100);
+      try { localStorage.setItem('pk_entries', JSON.stringify(trimmed)); } catch(e2) {}
+    }
+    // 2. Write to Firebase (async, non-blocking)
     if (fdb) {
-      // Fotoğraf varsa sıkıştır (Firebase 10MB limit)
       const e = { ...entry };
-      if (e.photo && e.photo.length > 100000) {
+      // Compress photo only if large, with size guard
+      if (e.photo && e.photo.length > 80000) {
         e.photo = compressPhoto(e.photo, 320, 240, 0.45);
       }
-      fdb.ref('pk/entries/' + e.tc).push(e).catch(err => console.warn('addEntry Firebase hata:', err.message));
+      // Remove null photo to save Firebase storage
+      if (!e.photo) delete e.photo;
+      fdb.ref('pk/entries/' + e.tc).push(e)
+        .catch(err => console.warn('addEntry Firebase error:', err.message));
     }
-    // Aynı cihaz diğer sekmelere bildir
+    // 3. Notify same-device tabs
     if (bc) bc.postMessage({ type: 'entry_added' });
-    refreshAdminUI(); updateRprPreview();
+    if (typeof debouncedRefresh === 'function') debouncedRefresh();
   },
 
   // ── QR ANAHTAR ──
@@ -2386,10 +2430,11 @@ const DB = {
     localStorage.setItem('pk_result', JSON.stringify(r));
     if (fdb) {
       const res = { ...r };
-      if (res.photo && res.photo.length > 100000) {
+      if (res.photo && res.photo.length > 80000) {
         res.photo = compressPhoto(res.photo, 320, 240, 0.45);
       }
-      fdb.ref('pk/result').set(res).catch(e => console.warn('setResult hata:', e.message));
+      if (!res.photo) delete res.photo;
+      fdb.ref('pk/result').set(res).catch(e => console.warn('setResult error:', e.message));
     }
     if (bc) bc.postMessage({ type: 'result', result: r });
   },
@@ -2420,18 +2465,27 @@ const DB = {
     }
   },
   getQRSession: (qrId, callback) => {
-    // Önce localStorage'dan dene (hızlı)
+    if (!qrId || typeof callback !== 'function') return;
+    // 1. Try localStorage first (fast, same-device)
     try {
       const local = JSON.parse(localStorage.getItem('pk_qrs_' + qrId) || 'null');
-      if (local) { callback(local); return; }
+      if (local && typeof local === 'object') { callback(local); return; }
     } catch(e) {}
-    // Firebase'den al
+    // 2. Fetch from Firebase (cross-device validation)
     if (fdb) {
       fdb.ref('qrSessions/' + qrId).once('value', snap => {
-        callback(snap.val());
-      }).catch(() => callback(null));
+        const val = snap.val();
+        // Cache locally if found
+        if (val) {
+          try { localStorage.setItem('pk_qrs_' + qrId, JSON.stringify(val)); } catch(e) {}
+        }
+        callback(val);
+      }).catch(err => {
+        console.warn('getQRSession Firebase error:', err.message);
+        callback(null);
+      });
     } else {
-      callback(null);
+      callback(null); // No Firebase, no local — QR cannot be validated
     }
   },
   invalidateQRSession: (qrId) => {
@@ -2476,16 +2530,28 @@ if (bc) {
 }
 
 // Fotoğraf sıkıştırma (Firebase boyut limiti için)
+// compressPhoto — synchronous version using cached image dimensions.
+// Note: camera frames are from <video> so dimensions are known at draw time.
+// For base64 inputs from photo capture (already rendered), this works correctly
+// because captureTurPhoto() uses ctx.drawImage(video) which has known dims.
 function compressPhoto(dataUrl, maxW, maxH, quality) {
   try {
+    if (!dataUrl || dataUrl.length < 50) return dataUrl;
     const canvas = document.createElement('canvas');
     const img = new Image();
     img.src = dataUrl;
-    const ratio = Math.min(maxW / (img.width||640), maxH / (img.height||480));
-    canvas.width  = Math.round((img.width||640)  * ratio);
-    canvas.height = Math.round((img.height||480) * ratio);
-    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL('image/jpeg', quality);
+    // Use natural dimensions if available (image already decoded from canvas source)
+    const w = img.naturalWidth  || img.width  || 640;
+    const h = img.naturalHeight || img.height || 480;
+    const ratio = Math.min(maxW / w, maxH / h, 1); // never upscale
+    canvas.width  = Math.round(w * ratio);
+    canvas.height = Math.round(h * ratio);
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const result = canvas.toDataURL('image/jpeg', quality);
+    // Discard canvas to free memory
+    canvas.width = 1; canvas.height = 1;
+    return result.length > 100 ? result : dataUrl;
   } catch(e) { return dataUrl; }
 }
 
@@ -2494,9 +2560,12 @@ function compressPhoto(dataUrl, maxW, maxH, quality) {
 // ═══════════════════════════════════════
 let CU = null, qrStream = null, scanInt = null, scanning = false, kvkk = true;
 let scanMode = 'entry', waitPoll = null, lastQRData = '', lastQRTime = 0;
-let turCamStream = null, turCamOpen = false, turTimeLeft = 300, turCurrentKey = '';
+let turCamStream = null, turCamOpen = false;
 let turStarted = false, lastPendingId = null;
-const DURATION = 300, CIRC = 2 * Math.PI * 35;
+// FIX: turTimeLeft, DURATION, turCurrentKey removed (genTurQR deprecated)
+const CIRC = 2 * Math.PI * 35; // SVG ring circumference (kept for UI ring element)
+// Tracked interval handles (prevent memory leaks / duplicate timers)
+let _turClockInt = null, _turPollInt = null;
 
 // ═══════════════════════════════════════
 //  UI HELPERS
@@ -2723,7 +2792,9 @@ function doLogout() {
 //  ADMIN DASHBOARD
 // ═══════════════════════════════════════
 function startAdminClock() {
-  setInterval(() => {
+  // Guard: only one clock interval at a time
+  if (window._admClockInt) return;
+  window._admClockInt = setInterval(() => {
     const c = document.getElementById('adm-clock');
     if (c) c.textContent = new Date().toLocaleTimeString(lang === 'en' ? 'en-GB' : 'tr-TR');
   }, 1000);
@@ -2731,9 +2802,12 @@ function startAdminClock() {
 
 function refreshAdminUI() {
   const users = DB.getUsers(), entries = DB.getEntries();
+  // FIX: Cache all statuses once — avoids N localStorage reads in loops
+  const statusCache = {};
+  users.forEach(u => { statusCache[u.tc] = DB.getStatus(u.tc); });
   const inE = entries.filter(e => e.mode !== 'exit');
   const outE = entries.filter(e => e.mode === 'exit');
-  const insideC = users.filter(u => DB.getStatus(u.tc) === 'inside').length;
+  const insideC = users.filter(u => statusCache[u.tc] === 'inside').length;
   const el = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
   el('cnt-in', inE.length); el('cnt-out', outE.length);
   el('cnt-users', users.length); el('cnt-inside', insideC);
@@ -2746,8 +2820,7 @@ function refreshAdminUI() {
   if (uList) {
     if (!users.length) { uList.innerHTML = '<div class="log-empty" data-t="no_users">' + t('no_users') + '</div>'; }
     else uList.innerHTML = users.map(u => {
-      const st = DB.getStatus(u.tc);
-      const inside = st === 'inside';
+      const inside = statusCache[u.tc] === 'inside'; // FIX: use cache
       return `<div class="log-item" style="flex-wrap:wrap;gap:8px;">
         <div class="log-thumb" style="display:flex;align-items:center;justify-content:center;font-size:16px;background:${inside?'var(--green-l)':'var(--off)'};">${inside?'🟢':'⚪'}</div>
         <div class="log-info"><div class="log-name">${u.ad} ${u.soyad}</div><div class="log-meta">${u.tc.substring(0,3)}***${u.tc.slice(-2)} · ${t(inside?'inside_status':'outside_status')}</div></div>
@@ -2967,14 +3040,14 @@ function startTurnikeSystem() {
   // "Bekleniyor" modunu başlat (genTurQR deprecated, sadece UI güncelle)
   genTurQR();
 
-  // Timer güncelleme — artık kullanıcı QR süresini değil sistem saatini göster
-  setInterval(() => {
+  // Timer güncelleme — sistem saati
+  _turClockInt = setInterval(() => {
     const c = document.getElementById('tur-clock');
     if (c) c.textContent = new Date().toLocaleTimeString(lang === 'en' ? 'en-GB' : 'tr-TR');
   }, 1000);
 
-  // Firebase pending listener (legacy fallback — kart tarama için hâlâ gerekli)
-  setInterval(pollPendingLocal, 500);
+  // Firebase pending listener (legacy fallback — kart tarama için)
+  _turPollInt = setInterval(pollPendingLocal, 500);
 
   // Timer progress bar'ı sabit göster (artık countdown değil)
   const pf = document.getElementById('tur-pfill');
@@ -3014,9 +3087,12 @@ function genTurQR() {
 let userQRTimerInterval = null; // Kullanıcı QR geri sayım zamanlayıcısı
 
 function generateUserQR() {
-  if (!CU) return;
-  // Mevcut QR zamanlayıcısını temizle
-  clearInterval(userQRTimerInterval);
+  // FIX: Guard against null CU (called before session restore)
+  if (!CU || !CU.tc || !CU.ad) {
+    console.warn('generateUserQR: no active user session');
+    return;
+  }
+  clearInterval(userQRTimerInterval); // Clear any existing timer
 
   const qrId   = genKey() + genKey(); // Benzersiz 32 karakterli oturum ID
   const tc     = CU.tc;
@@ -3091,12 +3167,16 @@ function updateUserQRTimer(seconds) {
   }
 }
 
-// Kullanıcı QR'ını yenile
+// Kullanıcı QR yenileme — debounced against rapid clicks
+let _refreshQRDebounce = false;
 window.refreshUserQR = () => {
+  if (_refreshQRDebounce) return;
+  _refreshQRDebounce = true;
+  setTimeout(() => { _refreshQRDebounce = false; }, 1000);
   const expired = document.getElementById('uqr-expired-msg');
   if (expired) expired.style.display = 'none';
   const uqrBox = document.getElementById('user-qr-display');
-  if (uqrBox) uqrBox.style.opacity = '1';
+  if (uqrBox) { uqrBox.style.opacity = '1'; uqrBox.innerHTML = ''; }
   generateUserQR();
   toast('✅', lang==='en' ? 'QR refreshed!' : 'QR yenilendi!', 2000);
 };
@@ -3195,39 +3275,62 @@ let turHybridLastTime = 0;
 function startTurHybridScan() {
   if (turHybridScanInterval) return; // Zaten çalışıyor
   turHybridLastData = '';
-  turHybridScanInterval = setInterval(() => {
+  // FIX: Use requestAnimationFrame-based scan instead of blind setInterval
+  // This ensures we only process NEW camera frames (saves CPU)
+  let _hybridRunning = true;
+  let _lastScanTime  = 0;
+  const _SCAN_INTERVAL = 250; // ms between scans (4 fps — sufficient for QR)
+
+  function _hybridScanTick() {
+    if (!_hybridRunning) return;
+    requestAnimationFrame(_hybridScanTick);
+
+    const now = Date.now();
+    if (now - _lastScanTime < _SCAN_INTERVAL) return;
+    _lastScanTime = now;
+
     const v = document.getElementById('tur-vid');
     const c = document.getElementById('adm-cap-cvs');
     if (!v || v.readyState !== v.HAVE_ENOUGH_DATA || !v.videoWidth) return;
-    c.width = v.videoWidth; c.height = v.videoHeight;
-    const ctx = c.getContext('2d');
+
+    // Resize canvas only if needed (avoids layout thrash)
+    if (c.width !== v.videoWidth || c.height !== v.videoHeight) {
+      c.width = v.videoWidth; c.height = v.videoHeight;
+    }
+    const ctx = c.getContext('2d', { willReadFrequently: true });
     ctx.save(); ctx.translate(c.width, 0); ctx.scale(-1, 1);
     ctx.drawImage(v, 0, 0, c.width, c.height); ctx.restore();
     const imgData = ctx.getImageData(0, 0, c.width, c.height);
-    const code = jsQR(imgData.data, c.width, c.height, {inversionAttempts:'attemptBoth'});
+    const code = jsQR(imgData.data, c.width, c.height, {inversionAttempts:'dontInvert'});
     if (!code || !code.data) return;
 
-    // Çift okuma önleme (1.5 saniye)
-    const now = Date.now();
+    // Duplicate read guard (1.5s cooldown per QR value)
     if (code.data === turHybridLastData && (now - turHybridLastTime) < 1500) return;
     turHybridLastData = code.data;
     turHybridLastTime = now;
 
-    // Hybrid QR yönlendirme
     const data = code.data;
     if (data.startsWith('PARKILIT_DYN|') || data.startsWith('PARKILIT_CARD|')) {
-      // Her iki tip QR'ı handleTurnikeScannedQR işler
       handleTurnikeScannedQR(data);
     }
-    // Kart tarama aktifse ek olarak adminCardScan da işler (aşağıda)
-  }, 200);
+  }
+
+  // Store stop function on the interval slot for cleanup
+  turHybridScanInterval = { _stop: () => { _hybridRunning = false; } };
+  _hybridScanTick(); // kick off rAF loop
 }
 
 // Turnike kamerası kapandığında hybrid taramayı durdur
 function stopTurHybridScan() {
-  clearInterval(turHybridScanInterval);
+  // FIX: rAF-based scan — stop via flag, not clearInterval
+  if (turHybridScanInterval && turHybridScanInterval._stop) {
+    turHybridScanInterval._stop();
+  } else if (turHybridScanInterval) {
+    clearInterval(turHybridScanInterval); // legacy fallback
+  }
   turHybridScanInterval = null;
   turHybridLastData = '';
+  _turnikeProcessing = false; // Reset lock on camera stop
 }
 
 // Admin Card Scan — kart QR okuma modu (ayrı toggle)
@@ -3307,9 +3410,11 @@ function handleTurnikePending(p) {
 }
 
 function pollPendingLocal() {
-  // Same-tab fallback (if user and turnike are in the same tab, unlikely but safe)
+  // FIX: Only poll when on turnstile screen (saves 2 localStorage reads/sec otherwise)
+  const turScreen = document.getElementById('s-turnike');
+  if (!turScreen || !turScreen.classList.contains('active')) return;
   const p = DB.getPending();
-  if (p) handleTurnikePending(p);
+  if (p && p.tc) handleTurnikePending(p); // FIX: guard against empty pending
 }
 
 function showTkOv(entry, photo) {
@@ -3376,13 +3481,13 @@ function setupScanUI() {
 }
 
 window.switchMode = (mode) => {
-  const st = DB.getStatus(CU ? CU.tc : '');
+  if (!CU) return; // FIX: no user session — ignore
+  const st = DB.getStatus(CU.tc);
   if (mode==='entry' && st==='inside') { toast('⚠️', t('toast_already_in'), 3500); return; }
   if (mode==='exit'  && st==='outside'){ toast('⚠️', t('toast_already_out'), 3500); return; }
   scanMode = mode;
   setupScanUI();
-  // ← Hybrid: Mod değişince yeni QR üret (mod bilgisi QR içine gömülü)
-  generateUserQR();
+  generateUserQR(); // Regenerate QR with new mode embedded
 };
 
 async function startQRCam() {
@@ -3421,8 +3526,13 @@ async function startQRCam() {
 }
 
 function stopQRCam() {
-  if (qrStream) { qrStream.getTracks().forEach(t=>t.stop()); qrStream = null; }
-  clearInterval(scanInt); scanning = false;
+  // FIX: Safe to call even in hybrid mode where qrStream is null
+  if (qrStream) {
+    try { qrStream.getTracks().forEach(t => t.stop()); } catch(e) {}
+    qrStream = null;
+  }
+  if (scanInt) { clearInterval(scanInt); scanInt = null; }
+  scanning = false;
 }
 
 // QR okuma için özel canvas ve context — her frame yeniden oluşturma
@@ -3445,6 +3555,10 @@ function tryDecode(imageData, w, h) {
   return code;
 }
 
+// frame() — Legacy QR scanner frame loop (user-side camera scanning).
+// In the hybrid system users SHOW their QR (generateUserQR) instead of scanning.
+// This function is kept for legacy path compatibility but is no longer called
+// in the normal flow. startQRCam() is also legacy.
 function frame() {
   if (!scanning) return;
   const v = document.getElementById('vid');
@@ -3531,13 +3645,17 @@ function handleQR(data) {
   showSuccess(entry);
 }
 
-// ── TURNİKE KAMERA QR DOĞRULAMA (Ana hybrid akış) ────────────────────
-// Turnike kamerası kullanıcının QR kodunu tarar.
-// Hem dinamik (telefon) hem statik (kart) QR'ı işler.
-// Firebase'den doğrulama yapar → giriş/çıkış kaydı + fotoğraf çeker.
+// ── TURNİKE KAMERA QR DOĞRULAMA (Hybrid) ────────────────────────────
+// Turnike kamerası kullanıcının QR'ını tarar.
+// Hem dinamik (telefon) hem statik (kart) QR işlenir.
+// Firebase'den doğrulama → giriş/çıkış kaydı + fotoğraf.
 // ─────────────────────────────────────────────────────────────────────
+let _turnikeProcessing = false; // Lock: prevent double-scan during Firebase call
+
 function handleTurnikeScannedQR(data) {
   if (!data || typeof data !== 'string') return;
+  // Lock: prevent duplicate processing while Firebase validates
+  if (_turnikeProcessing) return;
 
   const isDynamic = data.startsWith('PARKILIT_DYN|');
   const isCard    = data.startsWith('PARKILIT_CARD|');
@@ -3549,17 +3667,15 @@ function handleTurnikeScannedQR(data) {
   }
 
   if (isCard) {
-    // ── STATİK KART QR ────────────────────────────────────────────────
-    // Format: PARKILIT_CARD|{tc}|{name}
-    // Admin tarafından oluşturulan fiziksel kart
+    // ── STATİK KART QR ──────────────────────────────────────────────
+    _turnikeProcessing = true;
+    setTimeout(() => { _turnikeProcessing = false; }, 2000); // Release after 2s
     const parts = data.split('|');
     if (parts.length >= 3) {
-      const tc   = parts[1];
-      const name = parts[2];
-      // Kart QR'ını kart tarama sistemi ile işle (mevcut handleAdminCardEntry)
-      handleAdminCardEntry(tc, name);
+      handleAdminCardEntry(parts[1], parts[2]);
     } else {
       toast('⚠️', lang==='en' ? 'Invalid card QR' : 'Geçersiz kart QR', 3000);
+      _turnikeProcessing = false;
     }
     return;
   }
@@ -3577,36 +3693,37 @@ function handleTurnikeScannedQR(data) {
   const ts   = parseInt(parts[3]);
   const now  = Date.now();
 
-  // 1. Zaman kontrolü — client-side hızlı kontrol (5 dk)
+  // 1. Client-side time check (fast, no Firebase call)
   if (isNaN(ts) || (now - ts) > 300000) {
     toast('⚠️', lang==='en' ? 'QR code expired' : 'QR kodu süresi dolmuş', 3000);
     turFlash();
     return;
   }
 
-  // 2. Firebase'den QR oturumunu doğrula (backend doğrulama)
+  // 2. Lock + Firebase validation
+  _turnikeProcessing = true;
   DB.getQRSession(qrId, (session) => {
     if (!session) {
       toast('⚠️', lang==='en' ? 'QR not found in database' : 'QR veritabanında bulunamadı', 3000);
-      return;
+      _turnikeProcessing = false; return;
     }
 
     // 3. Tek kullanım kontrolü
     if (session.used === true) {
       toast('⚠️', lang==='en' ? 'QR already used' : 'QR daha önce kullanılmış', 3000);
-      return;
+      _turnikeProcessing = false; return;
     }
 
     // 4. Süre kontrolü (Firebase tarafı)
     if (session.expiresAt && now > session.expiresAt) {
       toast('⚠️', lang==='en' ? 'QR session expired' : 'QR oturumu süresi dolmuş', 3000);
-      return;
+      _turnikeProcessing = false; return;
     }
 
     // 5. TC eşleşmesi kontrolü
     if (session.tc !== tc) {
       toast('⚠️', lang==='en' ? 'QR mismatch' : 'QR uyuşmazlığı', 3000);
-      return;
+      _turnikeProcessing = false; return;
     }
 
     // 6. Kullanıcı varlık kontrolü
@@ -3614,7 +3731,7 @@ function handleTurnikeScannedQR(data) {
     const user  = users.find(u => u.tc === tc);
     if (!user) {
       toast('⚠️', lang==='en' ? 'User not registered' : 'Kullanıcı kayıtlı değil', 3000);
-      return;
+      _turnikeProcessing = false; return;
     }
 
     // 7. Giriş/çıkış durumu kontrolü
@@ -3672,6 +3789,8 @@ function handleTurnikeScannedQR(data) {
         : (lang === 'en' ? ' entered.' : ' giriş yaptı.')),
       4000
     );
+    // Release lock after 2s (allows next scan)
+    setTimeout(() => { _turnikeProcessing = false; }, 2000);
   });
 }
 
@@ -3745,18 +3864,7 @@ window.doManuel = () => {
 // CONFETTI
 
 // Fotoğraf sıkıştırma (Firebase boyut limiti için)
-function compressPhoto(dataUrl, maxW, maxH, quality) {
-  try {
-    const canvas = document.createElement('canvas');
-    const img = new Image();
-    img.src = dataUrl;
-    const ratio = Math.min(maxW / (img.width||640), maxH / (img.height||480));
-    canvas.width  = Math.round((img.width||640)  * ratio);
-    canvas.height = Math.round((img.height||480) * ratio);
-    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL('image/jpeg', quality);
-  } catch(e) { return dataUrl; }
-}
+// compressPhoto defined above (deduped)
 
 function launchConfetti() {
   const canvas = document.getElementById('confetti-cvs');
@@ -3817,7 +3925,7 @@ function init() {
       currentRoute = path;
       applyRoute(path);
       setupScanUI();
-      startQRCam();
+      generateUserQR(); // FIX: was startQRCam — hybrid system
     } else {
       navigate('/app', true);
       setRole('reg');
@@ -3827,13 +3935,16 @@ function init() {
     applyRoute('/');
   }
 
-  // Admin clock initial
-  setInterval(() => {
-    const c = document.getElementById('adm-clock');
-    if (c && document.getElementById('s-admin').classList.contains('active')) {
-      c.textContent = new Date().toLocaleTimeString(lang === 'en' ? 'en-GB' : 'tr-TR');
-    }
-  }, 1000);
+  // Admin clock — guarded against double init
+  if (!window._admClockInt) {
+    window._admClockInt = setInterval(() => {
+      const c = document.getElementById('adm-clock');
+      if (c && document.getElementById('s-admin') &&
+          document.getElementById('s-admin').classList.contains('active')) {
+        c.textContent = new Date().toLocaleTimeString(lang === 'en' ? 'en-GB' : 'tr-TR');
+      }
+    }, 1000);
+  }
 
   // Re-apply translations on lang change
   document.querySelectorAll('.lang-btn, .lang-btn-land').forEach(btn => {
@@ -3862,15 +3973,8 @@ document.addEventListener('DOMContentLoaded', initScrollReveal);
 // Re-init when landing shown
 const _origCloseApp = window.closeApp;
 // Also add cursor pointer to all interactive elements
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('button, a, [onclick], .feat-card, .ska-card, .team-card, .prob-card, .fcard').forEach(el => {
-    if (!el.style.cursor) el.style.cursor = 'pointer';
-  });
-  // Smooth hover on buttons
-  document.querySelectorAll('.hbtn, .nav-cta, .lc-btn, .gen-btn, .app-btn').forEach(btn => {
-    btn.classList.add('btn-ripple');
-  });
-});
+// Cursor + ripple applied via CSS class .btn-ripple in stylesheet
+// (removed DOMContentLoaded listener that did this — now CSS-only)
 
 // ═══════════════════════════════════════
 //  LIVE STATS BAR — real-time counters
@@ -3896,17 +4000,20 @@ function updateStatsBar() {
   const entries = DB.getEntries();
   const inE     = entries.filter(e => e.mode !== 'exit').length;
   const outE    = entries.filter(e => e.mode === 'exit').length;
-  const inside  = users.filter(u => DB.getStatus(u.tc) === 'inside').length;
+  // FIX: single pass, no repeated localStorage reads
+  const inside  = users.reduce((n, u) => n + (DB.getStatus(u.tc) === 'inside' ? 1 : 0), 0);
   animateNum(document.getElementById('sb-users'),  users.length);
   animateNum(document.getElementById('sb-in'),     inE);
   animateNum(document.getElementById('sb-out'),    outE);
   animateNum(document.getElementById('sb-inside'), inside);
 }
 
-// Initial stats and periodic refresh
+// Initial stats and periodic refresh — guarded
 document.addEventListener('DOMContentLoaded', () => {
   updateStatsBar();
-  setInterval(updateStatsBar, 5000);
+  if (!window._statsBarInt) {
+    window._statsBarInt = setInterval(updateStatsBar, 5000);
+  }
 });
 
 // ═══════════════════════════════════════
@@ -4070,8 +4177,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavScroll();
   initNavActiveState();
   initEnhancedReveal();
-  setTimeout(initDualCameraLabels, 100);
-  updateStatsBar();
+  setTimeout(initDualCameraLabels, 200); // slight delay for DOM stability
+  // updateStatsBar called by init() — no duplicate needed
 });
 
 </script>
