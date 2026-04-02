@@ -904,6 +904,45 @@ html { scroll-padding-top: 72px; }
 .uqr-timer-bar{height:100%;background:var(--blue2);border-radius:4px;transition:width 1s linear,background .3s;}
 .uqr-hint{font-size:11px;color:rgba(255,255,255,.35);text-align:center;line-height:1.5;padding:0 8px;}
 /* ────────────────────────────────────────────────────────────────── */
+
+/* ── RESPONSIVE IMPROVEMENTS ─────────────────────────────── */
+/* Fix mockup phone overflow on small screens */
+@media(max-width:900px){
+  .hero-right{display:flex;justify-content:center;margin-top:32px;}
+  .mockup-phone{width:200px;}
+  .float-card{display:none;}
+}
+@media(max-width:680px){
+  .hero-inner{flex-direction:column;align-items:center;text-align:center;}
+  .hero-left{align-items:center;}
+  .hero-desc,.hero-slogan{text-align:center;}
+  .hero-cta{justify-content:center;}
+  .hero-right{margin-top:28px;}
+  .mockup-phone{width:180px;}
+  .phone-bar-logo{justify-content:center;}
+}
+@media(max-width:480px){
+  .mockup-phone{width:160px;}
+  .phone-qr-ico{font-size:54px;}
+  .nav-inner{padding:0 14px;}
+  .nav-links{gap:12px;}
+  .nav-link{font-size:12px;}
+  .hbtn{padding:11px 18px;font-size:13px;}
+}
+/* Prevent horizontal scroll on all devices */
+@media(max-width:768px){
+  .hero-stats{flex-wrap:wrap;}
+  .prob-grid,.sol-grid,.feat-grid{grid-template-columns:1fr;}
+  .ska-grid{grid-template-columns:1fr 1fr;}
+  .future-grid{grid-template-columns:1fr;}
+  .parks-grid{grid-template-columns:1fr;}
+  .imp-members{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:400px){
+  .ska-grid{grid-template-columns:1fr;}
+  .hero-badge{font-size:11px;}
+  .hero-title{font-size:28px !important;}
+}
 </style>
 </head>
 <body>
@@ -1015,7 +1054,10 @@ html { scroll-padding-top: 72px; }
         <div class="mockup-phone">
           <div class="phone-notch"></div>
           <div class="phone-qr-area"><span class="phone-qr-ico">📷</span></div>
-          <div class="phone-bar"><div class="phone-bar-txt">Ahmet Yılmaz</div><div class="phone-bar-sub">TC: 123***78</div></div>
+          <div class="phone-bar phone-bar-logo">
+            <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/wAARCABkAGQDASIAAhEBAxEB/8QAGwABAAMBAQEBAAAAAAAAAAAAAAQFBgMCAQf/xAAyEAACAQMDAgQEBQUBAAAAAAABAgMABBEFEiExBhNBUWEUInGBkSMyQlKhFTNTscH/xAAZAQEBAQEBAQAAAAAAAAAAAAAAAQIDBAX/xAAfEQEBAAMAAgMBAAAAAAAAAAAAARECITEDEkFR/9oADAMBAAIRAxEAPwD9TxisK+1KKximkLAsiEgCsLU9WhtYGkdwAo3Nk4A+9Vfpr1Gi1m2lZyywtLAGf5QQSP8AXFdFOjOaXPHPs6o9Wur90WCFizHkgH7VE1DVNRsZmSS3DqOHVDuU/cdc1O0/VILtFkgkD7gGIHbNS7q3juYykgyD2IPB+lcnVy4viP7bxqm1K/MjvcQxsrABi7HINIfxkckABSM5HtUd9Em8v2wuSccYqC0LTI5MLbqv0HL/AKDB/rXq8kZM9enHf2aRqcUU0cO5fNYDGe9bkE8V0oaNt3+1V/TbGO3g2woqk/M2OpPc0qS3lsCN65Pzrx3JPbBGfXNdWGWFPMbsKbWBc7e1VDRdamhuVtnlPlKCqMx59v8AvzXSy9pjy1f+eLU/R5/g9T/7D/8AivO29gxw7ZOO2KqEfxAspHCmCcFjjJCjH60xvfFVhAhkNwuB15wf0rysrYO5i0Bqt8bW3Z0++3C/UH+9Yej38k1spbHFQvFHiK01S0m8mZXZNmVzkHJFJ1T/FIJYbUuqABmwh5rphxrJfVrjnqpqV22C1Q7TTLhLCWbzHHl5KqT1IqfMcxOfnXHW7sMxfBq6n6g2j3m1eVBJq1RX8LfdkCjPcj+Kc/EYzggAY+lQbCPLbsZxn8vp7/AHqRHuBAPUAY4HGK3XLqy4Mx1mX2/s7HpVIv5CkhVQ20Y3g8jNZ2tIxCMCQQcEHrVq0lXVrOVe5HGK5ZOD0nqb5t0abYqsYGa0DU+xtwsbKCd2DyKZ3CeVOijgqxUfqMVXSjBrfXhVYpbqBkADgVXfFMaJpvmSLv8xhk9sCpUvSoEcMKhz8Yf5HXJzgkduMVz5bRXeMpnv8ASo9X1BYZFC8EjJH6Y5+mKkWE5nbEhyCcAnrWNYruGPzPzHJPvWrpyFRgjj61FMsmrPk7sAmsK6vRbW7ORnaBxVEt7gyyMhJBz0P3FRvEjNLFGXYMEJwSevOKz2cWsJ7RNpWqGSXEzSIg7+ZjFV3Q3C7T7mqQV9MkABRuXnP34p7oVwj28MUjAOv3M9x2rn2yw6YqFiWcbR7cHr9ar3iCcR2MijOWP6AUYHHFVzxEuLT+FMq2XlSqflI6Ht0r0YdrYy7rUGnxiGNBhzz7DHFdMvRbxwxx8c5GP1qpaTn93YbcHcRk8e1V3VJjdakscZ/wBqlAMHke3FdkjM7Y6a3PmknHRs7x34x3rSt5FkQEcEiqtpUflRKSeGOa4XdxJFqO1D8jI3txjP3+lNu4bxzxPVu/B/cV2z8wA/MMMPauTTnzOM4+lYt1cYRNjHaR+9cLxvKkJHUrgKfX1rFt7XrtOrn2SBkj2zV+0oNb7OPJXI3H6k/kKoviy8ZrWwVf8Al4J9DuH5qXI2cAeuTVb8URFSHHbb+Yz/AJWqmZzx1HvXO21AK5w3l/MFb7Vumvx2e5JGBXf+tMaS0EEbNJw8g2juD71dZrJbKF2ICsFJzis9LU+HK5j3jOKxr67M8hPJPXA71lznkq0wdDO5TcBhgv3P/FeraVUj2jcQMDPqa83UrxNJJjKqAB2Psaf6S+LSFuO/auPm9O+HDOrJJJA5Ynj61UpFxcSMCCrDP0q2aveGVgjHHORiqe8TyEd66I1kqyyrJJljgjp0rQa2Mk2B8u3H1FSSAd5r3tg5q8k6iW3t2fC8Y9aq9/L5cgK96e6hJuLBBjk1UzGILtyGxnoc/l7VjJ2nSJ7LfWpLy9E0UjKqLjbnjg0uneWaFVnk8x8dW6mkFuoUrF+HnnFP7GykliZ5QFiU8YJya8mSuMdGzaLNLFP5RkbKjJOe1LJNJMj7QWLDcfqe9T7yUGQxA/KBgVBRNhPc7a6R2ilpP7Lep8UWVoGYqduARz/mmoJA0KMO4FRbhVBc/KpJ/Ko2me+l6RrjKvJzjsTWxpO/y91TFcSQWymEAfKOcc1Y9LkaayCdx6c9M1Nj0hGuZXjJYP1J9DWppQihiMOMgAYrLnGpBq6aexs7hJoVBOCBgj6c1KlHmW7hWxuIPNZ0U0sTbNwGT8pOKlzsGlCgHBGaM6rpFbOzQNqNjwzOD1qf4iQWsCttCyN+H0qBHHmVQRuxzg9Ks1/b+fF5efmHSuXIycXRq0w7cNGNgH+Y/xWZqkYlkWJhlGOGHt71YEyVBJOcZPzVU1cA3MZPJQE/8AzRwytFLBRuJLEjJJ5r3t7ZmKk9M8Y7Z9KiWKHBOPwjrXdRlWDBH3HP8AmqM6Xd3E1tdGKLLkgg4HSun9oViFJPPQHJxVT1CQJM0h5XggdsZrR0YMwknbGGH3ra2l7Z/s7Z7k4/U1H1C5kJwGzzyc4/6qNb7vMBxwTx2oS6LHJOgj2UuZC5Lbj0qGtlv5Q0LGo9/epNiuVAI5OKW3VwYYiV5LHiomkeZLxLJ+lWWy1RGhV2J5bqKPqDNFLuzyeARTnZx0IOBmpNha+fKRn5RyazeXUq6Ij6jciBAFzkAAVCh3GNB6muV7e5OB09Kh2x/eA9MiijDJLZuCluD09RSu1j8uerFumOKmWqjvkVHvJWijyBknqa4cm3XLo48O0SQl1JJ5qW+6FsEbfapSPiJv6dT9a1LKfzFBbrnGM8V5GVzJ0bX0PqtxLIqQnYM4ZiOf0FJLyHy1YDqSAMckmp1vfQQBEkbJA6Y61BM3n3B7dM1Mkqq0kv2k1PVlWIx52BeccelVSF5lmCudyjGDVo1SEgBFPQ9BVPV38sqeMZ71fBXb4k5D0bJPbOMZ696s2lbZI8A7M1BsIhJIqnrt6D6VeohiiVYxtAFeb5TnYxxiPijW1CQPJKMbbcgj0P+2aXXMwaNWBO3pjPpSrXWzJjr3PP0r3XQ5JrRmIHTJPrXTGlqiS3Uo7hcDngj/APqK7tbfyY8E+vX0qY2WkBPIOc9e/wBqiS5AQegJ/wBaopLSKs8gbKZ5bOODjtUuBDFEqLknHHrUCGXe6gjPGO9bqsCoGeeKqkVdUVPxD/8Atcm3BywLD/8AIqBfXJEhC5VsZBHerH4kIEjkj7gJ+30rPjy0VuxHB7de9d8WN2V9Rbg8c7gT78/rVo8P3gFvHCvAAyM49PeqDYOI5S+CA2c4HHNbVre+VFGWGRjnPJNXZSTBGV61tRsPpV5MzRyuXG1FPI9K0r1SjFkByT+VLV1B43mySADkHHFMpbo7eVBqbSXHqrO+s5FUl8DkVSLmYxqQB8+duKveo3aiNi33PHaqRPGJJdzNhR2HerIR3W5NsYY7mPULpV2Ns2MBzx9ar9rOGG3JIVS2emKvRgWJduW9qoTKUkyxwDSjLJFbLVBJG/B5ycVl31sIELkYAGc1KS8LS+Wv3Hy4qC6kuXVgvCjvWsNaK6VjbrqM7MFHOfepE58oAHjFV+xcCNg3BzVmtGEiA55PasGx7oYJcRtluOeKhT7ppPTHatq5XzBgelV5gFJ9c1bBrRFukAVuTjHSqzqT5bceKuvlqRwaV3fykVFcPJU6s1v7PcaXeMUOGIqvWrhV5A3Dis4MFCknHQD71OtZxJBHjkHGetQtxWR7xiyMCBkHOaT6hj7q3FZO4hB7VLuRiMoOABx9armXzV3HkHIq3DRSl1XXTJ5NikA7Qv+X71vWvLNnJz3qAqiKJCclTk11sA4z3rFjPfLsdRgqxB9qg6lbi5gkRhkuMr9P+6k28qMuUINMb3b5Kk/NDMSP91csbGGVMZqfcylzuc89MH9qr1vJ5SjHNO7mfdGPpWc1h3DFEfFOlnSN9Nh5P8A9BT7Vq01vIqtHKqMpJBB7VNrUbk1YuXrttQ1DUGbfPMUUYJwd1Mk0uKM/JhwO3H/ABVSk1eSJRHFMcq7f7lUjHqc/nTRJrpUMCzFZAf8wPkE/rj6Vz26WVWaYzVNQMwmVXOyEGRjnvkAfmBVUNzcWkbHEpIBBCnGKbS6ney4FtFG6Ql1VmkYBgwwRkD7fjk1W9TvnuIRFGoDqc8qQf9Pbj1r0YY8cWXFaFvczPe3C27b32jdluQKqOq3C3OVAJLMOv2q96Rptxc6c11LsCSMGEe3O5RwM9D+Qr8v1u48yHbbgjqQFUc1OcuWjrEqYq9FeQXXmSRnGRhqkW8m/HzHP14P6VWLTSIIJJRLqVtJIuAHBbB9iRnir5F4csrSQyXVzJcyjp5ZCL/AGrtixvBOcyNqhqWuL5bBEhJIIJYdD3pJFOGlwp3hs1cNY1FY9PaOBkf71j3Syx7Swz+WfzqseHblLa3mBkBknGYwCOAuB+ePzrv64VqklNqM13FLDHGZzblXfJI8uQcfUYH1rV0a5SXcnO4Z4Pt/wAFVvTYLq6kuJ7e6tRBFuijBUhSM4A5HXnOfqal2Mxi1B4n2mPKuWJABGTjHqCMj8q4ckt47C1tbbUZLVFaONI0lUuqfhz1JGOM89OlaEJFw2/bLJKhUZYAFff259ap9vb3U+p3GowT3kfks5SK3RFCNwCPl9QDjPbkH0q8Wd5ELKaWI+fJCFlVQckf9gf51m8duHLVEOx8oPH8xtHbLH+fauNySoZ1GTyPTNQ9I1CG/SV4ixEJCSAjHJJGPzGKkX8Z2k87eelTvFrM6HVOFdgTgscge1Nba4KR8kEY4JqBbx+THGMcEZqzQRHy9rDHp96yydqcl3HRHarY1yC7sWyDkHNbOnzLJHsHQjisKG1YSAHp1Iqz6ZEiDzP4jxj0rlk6oxsWVg0n5F6Ecn61Xu9aq8Z4MWef15rXulRInkLBcjGfpms22j8pAg6gc5qsK6InOSKl1aqv8S44zksfb0q/WQBiC8jO0AHGMVmRxfu3C/MDWW7szFDuVRkjnPFZpLrBXFqK0lso46Hk49qmm2dUYs7NxwT6VCs2Jj3DjPFWZ9kM6wHr2Prg8VnGmimj5FxhT37E1iy2siqPbH5VJuZDjGe+Kxr37RK3A5Pak27UlM0G+fPHWm0Uu15Qxymc5P3NQo5FkVjnkDg9jUixOXUA9c0tS5fLJWrSAqYzT2JFbdgjFWzSiIlY98HHNZqHaFz0qXpZk3/ACn71yZzVi6s5z/cV2srdppAAOuKgTAqeKnWcISLI/ERyPWuabkqhk7rKPZH/ZqpW7eFdqx1Bz+tN2ZiQpYE7R1HelF5IYJN8ZPpg0U1dJhIpKAkdCRUlw7LASMZ4qDYTb7lWPbOAasepLiMn2pSzk6k0lpfOoK8jP5V2aTRjFEY96p+jNuZU9a0YoiybScEjGPSsmeSJ2cqXKR8H3poJTDLlTjPHWq/cLJPMznqTxVjglKuCfr6VLPBplNxECec/WqpqlqpiADDcTwD0q4yoN2O+eoqn6gwWfOfSttPRjy0zLtWxcYVNrcgN9K6hBHbAhjniuMuIpMfMQOlOoL9kUR7sAdxXPlpGVnlGPxLuVmOMuThvQEVGz5MoUHdg1ZdXkjkzjOOeKrQdg6FscHrW2H6kN9RNkIB2gYH/AFrpt2EhDdFIwwrClQiORsZwvA+lJ7aTyZQx7k9RxVVVFBZRl9pq6uDSEk9sHioqbJMYUdAOp96d6JFvuM44CjNJLFBGWXIxnHJqKi3dFFg0uZgHJOBirelxBOckc5wfWqzacNIFHOKkKPJkC5bJA+gPesbJG2Np0LRoY5GXG3aDjsR9KyZGK3RLjp2FXa2jY22Dnbn1qjvJ5N42nnmolGMaLkVSGR8oWz16e1P7CEjAI7DpUVlxJknntzT2KMLbocY4J/9qz25XKqXNf5T/Oq9qCnYd4IG0frVh1W1Wd/KQ4OASfSsS9aS3Ub1IZhzWyiVjN4RLqKkqFz8x4qFd3YVVjXoBgflUM3MgZD0J6/Sq7HLKsxTqp5Fa41sTKJNsxGQQelSIZ1HBqEJGUMG6Cpv7w7jkV595prPB0hhJdlh+Vc98e9WG3TZFBk4NG9RQPKSPToagq7g8d87c5pSa2Wox2FykuSRgds9a07MbriMkjGe9ZWiR7pEA7Amrd5qxxgBfvk1nNsqk7T14ryeWSNFVTkHIz71Bl1GVgCjjGfm47VCfVJj3P2q+DJl6jVxvLhSMDv3qZbXJkBwfSmF/IrxFT1z0zUW2cxNg+tHmjk7P/2Q==" alt="ParKilit" style="width:24px;height:24px;object-fit:contain;">
+            <div class="phone-bar-txt" style="font-size:11px;font-weight:900;color:rgba(255,255,255,.9);letter-spacing:.02em;">ParKilit</div>
+          </div>
           <span class="phone-badge">✅ TURNİKE AÇILDI</span>
         </div>
         <div class="float-card fc1"><div class="fc-ico">🔐</div><div class="fc-txt">QR Doğrulama</div><div class="fc-sub">5 dk'da bir yenilenir</div></div>
@@ -2688,7 +2730,7 @@ function setRole(role) {
 function doAdminLogin() {
   const user = document.getElementById('adm-user').value.trim();
   const pw = document.getElementById('adm-pw').value;
-  if (user !== 'parkilit_admin' || pw !== 'ParK!l1t@2025') {
+  if (user !== 'admin' || pw !== '12345678') {
     showErr('adm-err', t('err_admin')); return;
   }
   load(true);
@@ -2703,7 +2745,7 @@ function doAdminLogin() {
 function doTurnikeLogin() {
   const user = document.getElementById('adm-user').value.trim();
   const pw = document.getElementById('adm-pw').value;
-  if (user !== 'parkilit_admin' || pw !== 'TuRn!Ke#99') {
+  if (user !== 'turnike' || pw !== '12345678') {
     showErr('adm-err', t('err_admin')); return;
   }
   load(true);
