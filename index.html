@@ -2128,7 +2128,10 @@ window.addEventListener('popstate', () => {
   if (path === currentRoute) return;
   currentRoute = path;
   if (path === '/' || path === '/app') {
+    // FIX BUG 7: Clean up all active timers on back navigation
+    clearInterval(userQRTimerInterval);
     stopQRCam();
+    clearInterval(waitPoll);
   }
   applyRoute(path);
 });
@@ -2250,9 +2253,10 @@ function setupFirebaseListeners() {
   // Kullanıcılar değişince yerel cache'i güncelle
   fdb.ref('pk/users').on('value', snap => {
     const data = snap.val();
-    if (data) {
-      const users = Object.values(data);
-      localStorage.setItem('pk_users', JSON.stringify(users));
+    if (data && typeof data === 'object') {
+      // FIX STABILITY 4: Only update localStorage, never write back to Firebase
+      const users = Object.values(data).filter(u => u && u.tc);
+      try { localStorage.setItem('pk_users', JSON.stringify(users)); } catch(e) {}
     }
   });
 
@@ -2310,6 +2314,10 @@ function setupFirebaseListeners() {
     if (window._resultHandler) {
       window._resultHandler(res);
       window._resultHandler = null;
+    } else {
+      // FIX STABILITY 1: Race condition guard — store result briefly for late handler
+      window._pendingResult = res;
+      setTimeout(() => { window._pendingResult = null; }, 4000);
     }
   });
 
@@ -2404,8 +2412,8 @@ const DB = {
 
   // ── QR ANAHTAR ──
   setQR: (qrObj) => {
+    // FIX CLEANUP 1: pk/qr Firebase write removed (listener already removed, no need to write)
     localStorage.setItem('pk_qr', JSON.stringify(qrObj));
-    if (fdb) fdb.ref('pk/qr').set(qrObj).catch(e => console.warn('setQR hata:', e.message));
   },
   getQR: () => {
     try { return JSON.parse(localStorage.getItem('pk_qr')||'null'); } catch { return null; }
@@ -2519,7 +2527,11 @@ if (bc) {
     if (type === 'entry_added') {
       refreshAdminUI(); updateRprPreview();
     } else if (type === 'pending') {
-      handleTurnikePending(e.data.pending);
+      // FIX STABILITY 6: Only process on turnstile screen (matches pollPendingLocal guard)
+      const turScreen = document.getElementById('s-turnike');
+      if (turScreen && turScreen.classList.contains('active')) {
+        handleTurnikePending(e.data.pending);
+      }
     } else if (type === 'result') {
       if (window._resultHandler) {
         window._resultHandler(e.data.result);
@@ -2572,9 +2584,13 @@ let _turClockInt = null, _turPollInt = null;
 // ═══════════════════════════════════════
 let toastTimer = null;
 function toast(ico, msg, dur = 3200) {
-  document.getElementById('t-ico').textContent = ico;
-  document.getElementById('t-txt').textContent = msg;
-  const el = document.getElementById('toast');
+  // FIX STABILITY 5: null-guard all DOM accesses
+  const el  = document.getElementById('toast');
+  const ico_ = document.getElementById('t-ico');
+  const txt_ = document.getElementById('t-txt');
+  if (!el || !ico_ || !txt_) { console.log('[toast]', ico, msg); return; }
+  ico_.textContent = ico;
+  txt_.textContent = msg;
   el.classList.add('on');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('on'), dur);
@@ -2880,7 +2896,9 @@ window.generateCard = () => {
   if (!ad || !soyad) { showErr('gen-err', t('err_name')); return; }
   document.getElementById('card-qr').innerHTML = '';
   const cardQrText = 'PARKILIT_CARD|'+tc+'|'+ad+' '+soyad;
-  new QRCode(document.getElementById('card-qr'), { text:cardQrText, width:68, height:68, colorDark:'#1e293b', colorLight:'#fff', correctLevel:QRCode.CorrectLevel.H });
+  const cardQrEl = document.getElementById('card-qr');
+  if (cardQrEl) cardQrEl.innerHTML = ''; // FIX BUG 8: Clear previous canvas
+  new QRCode(cardQrEl, { text:cardQrText, width:68, height:68, colorDark:'#1e293b', colorLight:'#fff', correctLevel:QRCode.CorrectLevel.H });
   // ← Hybrid: Kart QR'ını Firebase'e kaydet (backend doğrulama için)
   // cardId = tc (statik kart — TC benzersiz identifier olarak kullanılır)
   DB.setCardQR(tc, ad+' '+soyad, 'CARD_' + tc);
@@ -2900,7 +2918,7 @@ window.printCard = () => {
   const c = document.getElementById('cp-el');
   if (!c) return;
   const w = window.open('', '_blank', 'width=480,height=360');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ParKilit Card</title><style>body{margin:20px;background:#fff;display:flex;flex-direction:column;align-items:center;font-family:sans-serif;}@media print{body{margin:0;padding:8px;}}</style></head><body>${c.outerHTML}<p style="font-size:11px;color:#888;margin-top:12px;">ParKilit Member Card</p><script>window.onload=()=>window.print();<\/script></body></html>`);
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ParKilit Card</title><style>body{margin:20px;background:#fff;display:flex;flex-direction:column;align-items:center;font-family:sans-serif;}@media print{body{margin:0;padding:8px;}}</style></head><body>${c.outerHTML}<p style="font-size:11px;color:#888;margin-top:12px;">ParKilit Member Card</p><\'+'script>window.onload=()=>window.print();<\/script></body></html>`);
   w.document.close();
 };
 window.saveCardImg = () => toast('💾', t('toast_cam_hint'), 4000);
@@ -2979,7 +2997,7 @@ window.exportPDF = () => {
     return `<tr><td>${x.photo?`<img src="${x.photo}" style="width:38px;height:38px;border-radius:7px;object-fit:cover;border:2px solid ${ex?'#f72585':'#10b981'};">`:`<span>${ex?'🔴':'🟢'}</span>`}</td><td>${x.name}</td><td>${tc}</td><td><span style="background:${ex?'#fce7f3':'#d1fae5'};color:${ex?'#be185d':'#065f46'};padding:3px 9px;border-radius:100px;font-size:11px;font-weight:700;">${t(ex?'log_exit':'log_entry')}</span></td><td>${x.time}</td></tr>`;
   }).join('');
   const w = window.open('', '_blank');
-  w.document.write(`<!DOCTYPE html><html lang="${lang}"><head><meta charset="UTF-8"><title>ParKilit Report</title><style>body{font-family:'Segoe UI',sans-serif;padding:28px;color:#1e293b;}h1{color:#1a73e8;margin-bottom:18px;}table{width:100%;border-collapse:collapse;font-size:13px;}th{background:#1a73e8;color:#fff;padding:9px 11px;text-align:left;}td{padding:8px 11px;border-bottom:1px solid #e2e8f0;vertical-align:middle;}tr:nth-child(even){background:#f8fafc;}</style></head><body><h1>🅿️ ParKilit · ${new Date().toLocaleString(lang==='en'?'en-GB':'tr-TR')}</h1><table><thead><tr><th>${t('rpr_photo')}</th><th>${t('ok_fullname')}</th><th>${t('ok_tc')}</th><th>${t('ok_islem')}</th><th>${t('ok_time')}</th></tr></thead><tbody>${rows}</tbody></table><script>window.onload=()=>window.print();<\/script></body></html>`);
+  w.document.write(`<!DOCTYPE html><html lang="${lang}"><head><meta charset="UTF-8"><title>ParKilit Report</title><style>body{font-family:'Segoe UI',sans-serif;padding:28px;color:#1e293b;}h1{color:#1a73e8;margin-bottom:18px;}table{width:100%;border-collapse:collapse;font-size:13px;}th{background:#1a73e8;color:#fff;padding:9px 11px;text-align:left;}td{padding:8px 11px;border-bottom:1px solid #e2e8f0;vertical-align:middle;}tr:nth-child(even){background:#f8fafc;}</style></head><body><h1>🅿️ ParKilit · ${new Date().toLocaleString(lang==='en'?'en-GB':'tr-TR')}</h1><table><thead><tr><th>${t('rpr_photo')}</th><th>${t('ok_fullname')}</th><th>${t('ok_tc')}</th><th>${t('ok_islem')}</th><th>${t('ok_time')}</th></tr></thead><tbody>${rows}</tbody></table><\'+'script>window.onload=()=>window.print();<\/script></body></html>`);
   w.document.close(); toast('🖨️', t('toast_pdf'), 3000);
 };
 window.exportPhotos = () => {
@@ -3130,13 +3148,21 @@ function generateUserQR() {
     });
   }
 
-  // Mod bilgisini göster
+  // Update mode badge
   const uqrMode = document.getElementById('uqr-mode-badge');
   if (uqrMode) {
     const x = mode === 'exit';
-    uqrMode.textContent  = t(x ? 'scan_btn_exit' : 'scan_btn_entry');
-    uqrMode.className    = 'uqr-mode-badge ' + (x ? 'out-badge' : 'in-badge');
+    uqrMode.textContent = t(x ? 'scan_btn_exit' : 'scan_btn_entry');
+    uqrMode.className   = 'uqr-mode-badge ' + (x ? 'out-badge' : 'in-badge');
   }
+  // Update hint text for current mode
+  const hintEl = document.getElementById('scan-hint');
+  if (hintEl) hintEl.setAttribute('data-t', mode === 'exit' ? 'scan_exit_hint' : 'scan_entry_hint');
+  // Ensure expired overlay is hidden on new QR generation
+  const expiredEl = document.getElementById('uqr-expired-msg');
+  if (expiredEl) expiredEl.style.display = 'none';
+  const uqrBox = document.getElementById('user-qr-display');
+  if (uqrBox) uqrBox.style.opacity = '1';
 
   // 5 dakikalık geri sayım
   let remaining = 300;
@@ -3197,9 +3223,8 @@ function updateTurTimer() {
 
   const pf = document.getElementById('tur-pfill');
   if (pf) pf.style.width = '100%'; // Full = ready
-  if (turTimeLeft <= 30) rfg.className = 'trfg danger';
-  else if (turTimeLeft <= 60) rfg.className = 'trfg warn';
-  else rfg.className = 'trfg';
+  // FIX: turTimeLeft removed (deprecated) — always show ready state
+  if (rfg) rfg.className = 'trfg';
 }
 
 window.toggleTurCam = async () => {
@@ -3267,44 +3292,60 @@ window.toggleAdminCardScan = () => {
 // Dinamik mod: Turnike kamerası açıkken sürekli tarar.
 // ─────────────────────────────────────────────────────────────────────
 
-let turHybridScanInterval = null;  // Turnike hybrid QR tarama döngüsü
-let turHybridLastData = '';        // Çift okuma önleme
+let turHybridScanInterval = null; // Hybrid scan handle
+let turHybridLastData = '';       // Duplicate scan guard
 let turHybridLastTime = 0;
+// FIX BUG 3: Module-scope flag so stop() works across rAF closure re-creations
+let _turHybridActive = false;     // Single source of truth for rAF loop
 
 // Turnike kamerası açıldığında hybrid taramayı başlat
+// ── TURNIKE HYBRID QR SCANNER (rAF-based, 4fps) ────────────────────
+// Uses module-scope _turHybridActive flag to prevent multiple rAF loops.
+// Scans for PARKILIT_DYN| (phone) and PARKILIT_CARD| (physical card).
+// ────────────────────────────────────────────────────────────────────
+let _hybridLastScanTime = 0; // module-scope for accurate timing
+
 function startTurHybridScan() {
-  if (turHybridScanInterval) return; // Zaten çalışıyor
+  if (_turHybridActive) return; // FIX: Guard via module-scope flag
+  _turHybridActive = true;
+  turHybridScanInterval = true; // Mark as active (truthy sentinel)
   turHybridLastData = '';
-  // FIX: Use requestAnimationFrame-based scan instead of blind setInterval
-  // This ensures we only process NEW camera frames (saves CPU)
-  let _hybridRunning = true;
-  let _lastScanTime  = 0;
-  const _SCAN_INTERVAL = 250; // ms between scans (4 fps — sufficient for QR)
 
   function _hybridScanTick() {
-    if (!_hybridRunning) return;
+    if (!_turHybridActive) return; // Module-scope exit — works across re-creations
+
     requestAnimationFrame(_hybridScanTick);
 
     const now = Date.now();
-    if (now - _lastScanTime < _SCAN_INTERVAL) return;
-    _lastScanTime = now;
+    if (now - _hybridLastScanTime < 250) return; // 4fps throttle
+    _hybridLastScanTime = now;
 
     const v = document.getElementById('tur-vid');
     const c = document.getElementById('adm-cap-cvs');
-    if (!v || v.readyState !== v.HAVE_ENOUGH_DATA || !v.videoWidth) return;
+    if (!v || !c || v.readyState !== v.HAVE_ENOUGH_DATA || !v.videoWidth) return;
 
-    // Resize canvas only if needed (avoids layout thrash)
+    // Resize canvas only when dimensions change (prevents layout thrash)
     if (c.width !== v.videoWidth || c.height !== v.videoHeight) {
-      c.width = v.videoWidth; c.height = v.videoHeight;
+      c.width  = v.videoWidth  || 640;
+      c.height = v.videoHeight || 480;
     }
+
     const ctx = c.getContext('2d', { willReadFrequently: true });
-    ctx.save(); ctx.translate(c.width, 0); ctx.scale(-1, 1);
-    ctx.drawImage(v, 0, 0, c.width, c.height); ctx.restore();
-    const imgData = ctx.getImageData(0, 0, c.width, c.height);
-    const code = jsQR(imgData.data, c.width, c.height, {inversionAttempts:'dontInvert'});
+    if (!ctx) return;
+    ctx.save();
+    ctx.translate(c.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(v, 0, 0, c.width, c.height);
+    ctx.restore();
+
+    let imgData;
+    try { imgData = ctx.getImageData(0, 0, c.width, c.height); } catch(e) { return; }
+    if (!imgData) return;
+
+    const code = jsQR(imgData.data, c.width, c.height, { inversionAttempts: 'dontInvert' });
     if (!code || !code.data) return;
 
-    // Duplicate read guard (1.5s cooldown per QR value)
+    // 1.5s per-value cooldown prevents double-triggering on same QR
     if (code.data === turHybridLastData && (now - turHybridLastTime) < 1500) return;
     turHybridLastData = code.data;
     turHybridLastTime = now;
@@ -3315,22 +3356,15 @@ function startTurHybridScan() {
     }
   }
 
-  // Store stop function on the interval slot for cleanup
-  turHybridScanInterval = { _stop: () => { _hybridRunning = false; } };
-  _hybridScanTick(); // kick off rAF loop
+  _hybridScanTick(); // Kick off rAF loop
 }
 
 // Turnike kamerası kapandığında hybrid taramayı durdur
 function stopTurHybridScan() {
-  // FIX: rAF-based scan — stop via flag, not clearInterval
-  if (turHybridScanInterval && turHybridScanInterval._stop) {
-    turHybridScanInterval._stop();
-  } else if (turHybridScanInterval) {
-    clearInterval(turHybridScanInterval); // legacy fallback
-  }
+  _turHybridActive   = false; // FIX: Module-scope flag stops all active rAF loops
   turHybridScanInterval = null;
-  turHybridLastData = '';
-  _turnikeProcessing = false; // Reset lock on camera stop
+  turHybridLastData  = '';
+  _turnikeProcessing = false; // Reset scan lock
 }
 
 // Admin Card Scan — kart QR okuma modu (ayrı toggle)
@@ -3591,7 +3625,7 @@ function handleQR(data) {
   if (data.startsWith('PARKILIT_DYN|') || data.startsWith('PARKILIT_CARD|')) {
     // Bu QR kodları turnike kamerası tarafından taranmalıdır, kullanıcı ekranında değil
     document.getElementById('err-desc').textContent =
-      lang==='en' ? 'Please show this QR to the turnstile camera.' : 'Bu QR'ı turnike kamerasına gösterin.';
+      lang==='en' ? 'Please show this QR to the turnstile camera.' : 'Bu QR kodunu turnike kamerasına gösterin.';
     stopQRCam(); navigate('/app/error');
     return;
   }
@@ -3806,7 +3840,7 @@ function showSuccess(entry) {
   const okTitle = document.getElementById('ok-title');
   if (okTitle) { okTitle.textContent = t(x?'ok_exit_title':'ok_entry_title'); okTitle.className = 'ok-title ' + (x?'p':'g'); }
   const okName = document.getElementById('ok-name');
-  if (okName) okName.textContent = t(x?'ok_exit_name':'ok_entry_name') + ', ' + CU.ad + '! ' + (x?'👋':'👋');
+  if (okName) okName.textContent = t(x?'ok_exit_name':'ok_entry_name') + ', ' + (CU ? CU.ad : entry.name.split(' ')[0]) + '! ' + (x?'👋':'👋');
   const setEl = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
   setEl('ok-fn', fn);
   setEl('ok-tc', tcMask);
@@ -3835,11 +3869,17 @@ window.doManuel = () => {
   const st = DB.getStatus(CU.tc);
   if (scanMode==='entry' && st==='inside') { toast('⚠️', t('toast_already_in'), 3500); return; }
   if (scanMode==='exit'  && st==='outside'){ toast('⚠️', t('toast_already_out'), 3500); return; }
+  // FIX BUG 4: Manual code entry — legacy path, add robust null guards
   const qrData = DB.getQR();
-  if (!qrData) { toast('❌', t('toast_no_qr')); return; }
+  if (!qrData || !qrData.ts || !qrData.key) {
+    toast('❌', lang==='en' ? 'No active QR session' : 'Aktif QR oturumu yok');
+    return;
+  }
   if (Date.now() - qrData.ts > 300000) { toast('❌', t('toast_qr_expired')); return; }
-  const mc = (qrData.mc || qrData.key.substring(0,6)).toUpperCase();
-  if (!mc.startsWith(code.substring(0, Math.min(code.length, 6)))) { toast('❌', t('toast_wrong_code')); return; }
+  const mc = (qrData.mc || (typeof qrData.key === 'string' ? qrData.key.substring(0,6) : '')).toUpperCase();
+  if (!mc || !mc.startsWith(code.substring(0, Math.min(code.length, 6)))) {
+    toast('❌', t('toast_wrong_code')); return;
+  }
   document.getElementById('manuel-inp').value = '';
   document.getElementById('manuel-wrap').classList.remove('open');
   scanning = false; clearInterval(scanInt); stopQRCam();
@@ -3966,12 +4006,11 @@ function initScrollReveal() {
   }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
   document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => {
-    observer.observe(el);
+    if (!el.classList.contains('revealed')) observer.observe(el); // FIX PERF 3: skip already-revealed
   });
 }
 document.addEventListener('DOMContentLoaded', initScrollReveal);
-// Re-init when landing shown
-const _origCloseApp = window.closeApp;
+// Re-init when landing shown (closeApp override removed — no longer needed)
 // Also add cursor pointer to all interactive elements
 // Cursor + ripple applied via CSS class .btn-ripple in stylesheet
 // (removed DOMContentLoaded listener that did this — now CSS-only)
@@ -3983,16 +4022,15 @@ function animateNum(el, target) {
   if (!el) return;
   const start = parseInt(el.textContent) || 0;
   if (start === target) return;
-  const dur = 600, step = 16;
-  const steps = Math.ceil(dur / step);
-  const inc = (target - start) / steps;
-  let cur = start, s = 0;
-  const iv = setInterval(() => {
-    s++;
-    cur += inc;
-    el.textContent = s >= steps ? target : Math.round(cur);
-    if (s >= steps) clearInterval(iv);
-  }, step);
+  // FIX STABILITY 2: rAF instead of setInterval (smoother, more efficient)
+  const dur = 500, startTime = performance.now();
+  function tick(now) {
+    const t = Math.min(1, (now - startTime) / dur);
+    const eased = t < 0.5 ? 2*t*t : -1+(4-2*t)*t; // easeInOut
+    el.textContent = Math.round(start + (target - start) * eased);
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 }
 
 function updateStatsBar() {
@@ -4008,13 +4046,14 @@ function updateStatsBar() {
   animateNum(document.getElementById('sb-inside'), inside);
 }
 
-// Initial stats and periodic refresh — guarded
-document.addEventListener('DOMContentLoaded', () => {
-  updateStatsBar();
-  if (!window._statsBarInt) {
-    window._statsBarInt = setInterval(updateStatsBar, 5000);
-  }
-});
+// Stats bar initialized in main init() — no separate DOMContentLoaded needed
+// Guard: start periodic updates only once
+if (!window._statsBarInt) {
+  document.addEventListener('DOMContentLoaded', () => {
+    updateStatsBar();
+    window._statsBarInt = setInterval(updateStatsBar, 8000); // FIX: 8s is enough for counters
+  });
+}
 
 // ═══════════════════════════════════════
 //  DUAL CAMERA CLARITY HELPER
@@ -4055,15 +4094,16 @@ function initDualCameraLabels() {
 function initNavActiveState() {
   const sections = ['problem','features','dfc','video-sec','future','impectia','parks','model3d'];
   const navLinks = document.querySelectorAll('.nav-link[onclick*="scrollToSection"]');
+  // FIX PERF 4: Cache onclick strings so loop doesn't call getAttribute every fire
+  const navLinkData = Array.from(navLinks).map(nl => ({
+    el: nl, onclick: nl.getAttribute('onclick') || ''
+  }));
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        navLinks.forEach(nl => nl.style.color = 'rgba(255,255,255,.65)');
         const id = entry.target.id;
-        navLinks.forEach(nl => {
-          if (nl.getAttribute('onclick') && nl.getAttribute('onclick').includes("'" + id + "'")) {
-            nl.style.color = '#fff';
-          }
+        navLinkData.forEach(({el, onclick}) => {
+          el.style.color = onclick.includes("'" + id + "'") ? '#fff' : 'rgba(255,255,255,.65)';
         });
       }
     });
@@ -4128,8 +4168,12 @@ function initEnhancedReveal() {
 function initNavScroll() {
   const nav = document.querySelector('nav');
   if (!nav) return;
-  let lastY = 0;
+  let lastY = 0, _scrollTicking = false;
   window.addEventListener('scroll', () => {
+    if (_scrollTicking) return;
+    _scrollTicking = true;
+    requestAnimationFrame(() => {
+    _scrollTicking = false;
     const y = window.scrollY;
     if (y > 80) {
       nav.style.background = 'rgba(10,22,40,.98)';
@@ -4139,6 +4183,8 @@ function initNavScroll() {
       nav.style.boxShadow = 'none';
     }
     lastY = y;
+  _scrollTicking = false;
+    });
   }, { passive: true });
 }
 
