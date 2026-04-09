@@ -2701,11 +2701,41 @@ function toggleTheme() {
 //  ROLE / AUTH
 // ═══════════════════════════════════════
 let activeRole = 'reg';
+
+// ── FIX: showStaffLogin was called in HTML but never defined ──────────
+// This was the root cause of admin/turnike login being completely broken.
+// The button click threw "ReferenceError: showStaffLogin is not defined",
+// so the staff-tabs div stayed hidden and the login panel was never shown.
+// ─────────────────────────────────────────────────────────────────────
+let _staffLoginShown = false;
+function showStaffLogin() {
+  _staffLoginShown = !_staffLoginShown;
+  const tabs = document.getElementById('staff-tabs');
+  const link = document.getElementById('staff-link');
+  if (_staffLoginShown) {
+    if (tabs) tabs.style.display = 'block';
+    // Default to admin tab and show the login panel
+    setRole('admin');
+    console.log('[Auth] Staff login panel opened');
+  } else {
+    if (tabs) tabs.style.display = 'none';
+    setRole('reg');
+    console.log('[Auth] Staff login panel closed');
+  }
+}
 function setRole(role) {
   activeRole = role;
+  // FIX 4: Sync both sets of tabs (primary hidden + secondary staff tabs)
   ['admin','turnike','reg','user'].forEach(r => {
-    document.getElementById('tab-'+r).classList.toggle('active', r === role);
+    const tab = document.getElementById('tab-'+r);
+    if (tab) tab.classList.toggle('active', r === role);
   });
+  // Staff panel secondary tabs
+  ['admin','turnike'].forEach(r => {
+    const tab2 = document.getElementById('tab-'+r+'2');
+    if (tab2) tab2.classList.toggle('active', r === role);
+  });
+  console.log('[Auth] Role set to:', role);
   document.getElementById('panel-admin').classList.toggle('visible', role === 'admin' || role === 'turnike');
   document.getElementById('panel-reg').classList.toggle('visible', role === 'reg');
   document.getElementById('panel-user').classList.toggle('visible', role === 'user');
@@ -2727,33 +2757,109 @@ function setRole(role) {
   }
 }
 
+// ── Admin Login ───────────────────────────────────────────────────────
+// Credentials are validated here (client-side for this deployment).
+// SECURITY NOTE: For production, move credential validation to a
+// Firebase Cloud Function or server-side endpoint. Never rely solely
+// on client-side checks for sensitive admin access.
+// ─────────────────────────────────────────────────────────────────────
+let _adminLoginAttempts = 0;
+let _adminLockUntil = 0;
+
 function doAdminLogin() {
-  const user = document.getElementById('adm-user').value.trim();
-  const pw = document.getElementById('adm-pw').value;
-  if (user !== 'admin' || pw !== '12345678') {
-    showErr('adm-err', t('err_admin')); return;
+  // Rate-limit: max 5 attempts, 30-second lockout
+  const now = Date.now();
+  if (now < _adminLockUntil) {
+    const remaining = Math.ceil((_adminLockUntil - now) / 1000);
+    showErr('adm-err', lang === 'en'
+      ? 'Too many attempts. Wait ' + remaining + 's.'
+      : remaining + ' saniye bekleyin.');
+    console.warn('[Auth] Admin login locked. Remaining:', remaining + 's');
+    return;
   }
+
+  const user = document.getElementById('adm-user').value.trim();
+  const pw   = document.getElementById('adm-pw').value;
+
+  // Input validation
+  if (!user || !pw) {
+    showErr('adm-err', t('err_admin'));
+    console.warn('[Auth] Admin login: empty fields');
+    return;
+  }
+
+  // Credential check
+  if (user !== 'admin' || pw !== '12345678') {
+    _adminLoginAttempts++;
+    console.warn('[Auth] Admin login FAILED for user:', user,
+      '| attempt:', _adminLoginAttempts);
+    if (_adminLoginAttempts >= 5) {
+      _adminLockUntil = Date.now() + 30000;
+      _adminLoginAttempts = 0;
+      console.warn('[Auth] Admin login LOCKED for 30s');
+    }
+    showErr('adm-err', t('err_admin'));
+    return;
+  }
+
+  // Success
+  _adminLoginAttempts = 0;
+  console.log('[Auth] Admin login SUCCESS for user:', user);
   load(true);
   setTimeout(() => {
     load(false);
     navigate('/app/admin');
     refreshAdminUI(); startAdminClock();
-    toast('', t('toast_admin_welcome'));
+    toast('⚙️', t('toast_admin_welcome'));
   }, 500);
 }
 
+// ── Turnike Login ─────────────────────────────────────────────────────
+let _turLoginAttempts = 0;
+let _turLockUntil = 0;
+
 function doTurnikeLogin() {
-  const user = document.getElementById('adm-user').value.trim();
-  const pw = document.getElementById('adm-pw').value;
-  if (user !== 'turnike' || pw !== '12345678') {
-    showErr('adm-err', t('err_admin')); return;
+  // Rate-limit
+  const now = Date.now();
+  if (now < _turLockUntil) {
+    const remaining = Math.ceil((_turLockUntil - now) / 1000);
+    showErr('adm-err', lang === 'en'
+      ? 'Too many attempts. Wait ' + remaining + 's.'
+      : remaining + ' saniye bekleyin.');
+    console.warn('[Auth] Turnike login locked. Remaining:', remaining + 's');
+    return;
   }
+
+  const user = document.getElementById('adm-user').value.trim();
+  const pw   = document.getElementById('adm-pw').value;
+
+  if (!user || !pw) {
+    showErr('adm-err', t('err_admin'));
+    console.warn('[Auth] Turnike login: empty fields');
+    return;
+  }
+
+  if (user !== 'turnike' || pw !== '12345678') {
+    _turLoginAttempts++;
+    console.warn('[Auth] Turnike login FAILED for user:', user,
+      '| attempt:', _turLoginAttempts);
+    if (_turLoginAttempts >= 5) {
+      _turLockUntil = Date.now() + 30000;
+      _turLoginAttempts = 0;
+      console.warn('[Auth] Turnike login LOCKED for 30s');
+    }
+    showErr('adm-err', t('err_admin'));
+    return;
+  }
+
+  _turLoginAttempts = 0;
+  console.log('[Auth] Turnike login SUCCESS for user:', user);
   load(true);
   setTimeout(() => {
     load(false);
     navigate('/app/turnike');
     startTurnikeSystem();
-    toast('', t('toast_turnike'));
+    toast('🔲', t('toast_turnike'));
   }, 500);
 }
 
@@ -2789,9 +2895,16 @@ function doLogin() {
   load(true);
 
   function tryLogin() {
-    const user = DB.getUsers().find(u => u.tc === tc && u.pw === hashPw(pw));
+    const allUsers = DB.getUsers();
+    console.log('[Auth] tryLogin: checking TC', tc.substring(0,3)+'***'+tc.slice(-2),
+      '| users in DB:', allUsers.length);
+    const user = allUsers.find(u => u.tc === tc && u.pw === hashPw(pw));
     load(false);
-    if (!user) return showErr('login-err', t('err_creds'));
+    if (!user) {
+      console.warn('[Auth] User login FAILED: TC not found or wrong password');
+      return showErr('login-err', t('err_creds'));
+    }
+    console.log('[Auth] User login SUCCESS:', user.ad, user.soyad);
     CU = user; DB.saveSession(user);
     // Firebase'den anlık durumu al
     if (fdb) {
